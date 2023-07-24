@@ -4136,6 +4136,8 @@ BoUpSLP::getReorderingData(const TreeEntry &TE, bool TopToBottom) {
     return TE.ReorderIndices;
   if (TE.State == TreeEntry::Vectorize && TE.getOpcode() == Instruction::PHI) {
     auto PHICompare = [](llvm::Value *V1, llvm::Value *V2) {
+      if (V1 == V2)
+        return false;
       if (!V1->hasOneUse() || !V2->hasOneUse())
         return false;
       auto *FirstUserOfPhi1 = cast<Instruction>(*V1->user_begin());
@@ -6156,7 +6158,7 @@ unsigned BoUpSLP::canMapToVector(Type *T, const DataLayout &DL) const {
   unsigned N = 1;
   Type *EltTy = T;
 
-  while (isa<StructType, ArrayType, VectorType>(EltTy)) {
+  while (isa<StructType, ArrayType, FixedVectorType>(EltTy)) {
     if (auto *ST = dyn_cast<StructType>(EltTy)) {
       // Check that struct is homogeneous.
       for (const auto *Ty : ST->elements())
@@ -6177,7 +6179,8 @@ unsigned BoUpSLP::canMapToVector(Type *T, const DataLayout &DL) const {
   if (!isValidElementType(EltTy))
     return 0;
   uint64_t VTSize = DL.getTypeStoreSizeInBits(FixedVectorType::get(EltTy, N));
-  if (VTSize < MinVecRegSize || VTSize > MaxVecRegSize || VTSize != DL.getTypeStoreSizeInBits(T))
+  if (VTSize < MinVecRegSize || VTSize > MaxVecRegSize ||
+      VTSize != DL.getTypeStoreSizeInBits(T))
     return 0;
   return N;
 }

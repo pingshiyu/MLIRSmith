@@ -30,8 +30,9 @@ using namespace mlir;
 // ToyToAffine RewritePatterns
 //===----------------------------------------------------------------------===//
 
-/// Convert the given RankedTensorType into the corresponding MemRefType.
-static MemRefType convertTensorToMemRef(RankedTensorType type) {
+/// Convert the given TensorType into the corresponding MemRefType.
+static MemRefType convertTensorToMemRef(TensorType type) {
+  assert(type.hasRank() && "expected only ranked shapes");
   return MemRefType::get(type.getShape(), type.getElementType());
 }
 
@@ -62,7 +63,7 @@ using LoopIterationFn = function_ref<Value(
 static void lowerOpToLoops(Operation *op, ValueRange operands,
                            PatternRewriter &rewriter,
                            LoopIterationFn processIteration) {
-  auto tensorType = llvm::cast<RankedTensorType>((*op->result_type_begin()));
+  auto tensorType = (*op->result_type_begin()).cast<TensorType>();
   auto loc = op->getLoc();
 
   // Insert an allocation and deallocation for the result of this operation.
@@ -82,8 +83,7 @@ static void lowerOpToLoops(Operation *op, ValueRange operands,
         // and the loop induction variables. This function will return the value
         // to store at the current index.
         Value valueToStore = processIteration(nestedBuilder, operands, ivs);
-        nestedBuilder.create<affine::AffineStoreOp>(loc, valueToStore, alloc,
-                                                    ivs);
+        nestedBuilder.create<affine::AffineStoreOp>(loc, valueToStore, alloc, ivs);
       });
 
   // Replace this operation with the generated alloc.
@@ -144,7 +144,7 @@ struct ConstantOpLowering : public OpRewritePattern<toy::ConstantOp> {
 
     // When lowering the constant operation, we allocate and assign the constant
     // values to a corresponding memref allocation.
-    auto tensorType = llvm::cast<RankedTensorType>(op.getType());
+    auto tensorType = op.getType().cast<TensorType>();
     auto memRefType = convertTensorToMemRef(tensorType);
     auto alloc = insertAllocAndDealloc(memRefType, loc, rewriter);
 
@@ -293,7 +293,7 @@ struct TransposeOpLowering : public ConversionPattern {
                      // reverse indices.
                      SmallVector<Value, 2> reverseIvs(llvm::reverse(loopIvs));
                      return builder.create<affine::AffineLoadOp>(loc, input,
-                                                                 reverseIvs);
+                                                         reverseIvs);
                    });
     return success();
   }
@@ -342,7 +342,7 @@ void ToyToAffineLoweringPass::runOnOperation() {
   target.addIllegalDialect<toy::ToyDialect>();
   target.addDynamicallyLegalOp<toy::PrintOp>([](toy::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(),
-                         [](Type type) { return llvm::isa<TensorType>(type); });
+                         [](Type type) { return type.isa<TensorType>(); });
   });
 
   // Now that the conversion target has been defined, we just need to provide

@@ -9,8 +9,10 @@
 // This file implements the entry point for the Toy compiler.
 //
 //===----------------------------------------------------------------------===//
-
 #include "mlir/Dialect/Func/Extensions/AllExtensions.h"
+#include "smith/DiversityCriteria.h"
+#include "smith/ExpSetting.h"
+#include "smith/config.h"
 #include "toy/Dialect.h"
 #include "toy/MLIRGen.h"
 #include "toy/Parser.h"
@@ -30,12 +32,20 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/ErrorOr.h"
+#include "llvm/Support/InitLLVM.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
+#include <iostream>
 
 using namespace toy;
 namespace cl = llvm::cl;
+
+static cl::opt<std::string>
+    configFileName("c", cl::desc("Specify json config filename"),
+                   cl::value_desc("config file name"));
+
+static cl::opt<bool> isDiverse("d", cl::desc("Generate diversely"));
 
 static cl::opt<std::string> inputFilename(cl::Positional,
                                           cl::desc("<input toy file>"),
@@ -52,12 +62,14 @@ static cl::opt<enum InputType> inputType(
                           "load the input file as an MLIR file")));
 
 namespace {
-enum Action { None, DumpAST, DumpMLIR, DumpMLIRAffine };
+enum Action { None, DumpConfig, DumpAST, DumpMLIR, DumpMLIRAffine, MLIRSmith };
 } // namespace
 static cl::opt<enum Action> emitAction(
     "emit", cl::desc("Select the kind of output desired"),
     cl::values(clEnumValN(DumpAST, "ast", "output the AST dump")),
     cl::values(clEnumValN(DumpMLIR, "mlir", "output the MLIR dump")),
+    cl::values(clEnumValN(DumpConfig, "config",
+                          "output the configuration template")),
     cl::values(clEnumValN(DumpMLIRAffine, "mlir-affine",
                           "output the MLIR dump after affine lowering")));
 
@@ -108,9 +120,13 @@ int loadMLIR(llvm::SourceMgr &sourceMgr, mlir::MLIRContext &context,
 }
 
 int dumpMLIR() {
+  initConfig(configFileName);
   mlir::DialectRegistry registry;
   mlir::func::registerAllExtensions(registry);
 
+  diverse = isDiverse;
+  std::cout << "d: " << diverse << std::endl;
+  diversity.import("cov.json");
   mlir::MLIRContext context(registry);
   // Load our Dialect in this MLIR Context.
   context.getOrLoadDialect<mlir::toy::ToyDialect>();
@@ -131,24 +147,25 @@ int dumpMLIR() {
 
   if (enableOpt || isLoweringToAffine) {
     // Inline all functions into main and then delete them.
-    pm.addPass(mlir::createInlinerPass());
+//    pm.addPass(mlir::createInlinerPass()); // TODO- crash
 
     // Now that there is only one function, we can infer the shapes of each of
     // the operations.
     mlir::OpPassManager &optPM = pm.nest<mlir::toy::FuncOp>();
     optPM.addPass(mlir::toy::createShapeInferencePass());
-    optPM.addPass(mlir::createCanonicalizerPass());
+    //    optPM.addPass(mlir::createCanonicalizerPass());
     optPM.addPass(mlir::createCSEPass());
   }
 
   if (isLoweringToAffine) {
     // Partially lower the toy dialect.
-    pm.addPass(mlir::toy::createLowerToAffinePass());
+    pm.addPass(mlir::toy::createMLIRSmithPass());
 
     // Add a few cleanups post lowering.
     mlir::OpPassManager &optPM = pm.nest<mlir::func::FuncOp>();
-    optPM.addPass(mlir::createCanonicalizerPass());
-    optPM.addPass(mlir::createCSEPass());
+    // Partially lower the toy dialect with a few cleanups afterwards.
+    //    optPM.addPass(mlir::createCanonicalizerPass());
+    //    optPM.addPass(mlir::createCSEPass());
 
     // Add optimizations if enabled.
     if (enableOpt) {
@@ -161,6 +178,13 @@ int dumpMLIR() {
     return 4;
 
   module->dump();
+
+  diversity.exportSelf("cov.json");
+  return 0;
+}
+
+int dumpConfig() {
+  mlir::toy::printConfig();
   return 0;
 }
 
@@ -183,10 +207,13 @@ int main(int argc, char **argv) {
   mlir::registerAsmPrinterCLOptions();
   mlir::registerMLIRContextCLOptions();
   mlir::registerPassManagerCLOptions();
-
+  //  mlir::init
   cl::ParseCommandLineOptions(argc, argv, "toy compiler\n");
+  llvm::InitLLVM(argc, argv);
 
   switch (emitAction) {
+  case Action::DumpConfig:
+    return dumpConfig();
   case Action::DumpAST:
     return dumpAST();
   case Action::DumpMLIR:

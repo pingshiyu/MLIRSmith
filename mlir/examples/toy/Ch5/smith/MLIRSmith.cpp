@@ -110,6 +110,7 @@ namespace {
 struct MLIRSmithPass
     : public PassWrapper<MLIRSmithPass, OperationPass<ModuleOp>> {
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(MLIRSmithPass)
+
   void getDependentDialects(DialectRegistry &registry) const override {
     registry.insert<scf::SCFDialect, linalg::LinalgDialect, affine::AffineDialect,
                     arith::ArithDialect, index::IndexDialect,

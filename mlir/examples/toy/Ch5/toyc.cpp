@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
   mlir::registerAsmPrinterCLOptions();
   mlir::registerMLIRContextCLOptions();
   mlir::registerPassManagerCLOptions();
-  //  mlir::init
+
   cl::ParseCommandLineOptions(argc, argv, "toy compiler\n");
   llvm::InitLLVM(argc, argv);
 

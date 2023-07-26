@@ -79,9 +79,7 @@ struct DiversityCriteria {
   }
 
   void import(std::string path) {
-    std::cout << "1\n" ;
     std::ifstream f(path);
-    std::cout << "2\n" ;
     if (!f) {
       std::ofstream covfile;
       covfile.open(path, std::ios::out | std::ios::app );
@@ -89,16 +87,13 @@ struct DiversityCriteria {
       covfile  << "{}" << std::endl;
       covfile.flush();
     }
-    std::cout << "3\n" ;
 
     json data = json::parse(f);
     json coveredOps = data["covered_ops"];
-    std::cout << "1\n" ;
 
     for (json::iterator it = coveredOps.begin(); it != coveredOps.end(); it++) {
       ops.insert(*it);
     }
-    std::cout << "2\n" ;
 
     json coveredOpConnections = data["covered_op_connections"];
     for (json::iterator it = coveredOpConnections.begin();

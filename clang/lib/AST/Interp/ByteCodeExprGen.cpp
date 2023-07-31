@@ -127,6 +127,15 @@ bool ByteCodeExprGen<Emitter>::VisitCastExpr(const CastExpr *CE) {
       return true;
     return this->emitNull(classifyPrim(CE->getType()), CE);
 
+  case CK_PointerToIntegral: {
+    // TODO: Discard handling.
+    if (!this->visit(SubExpr))
+      return false;
+
+    PrimType T = classifyPrim(CE->getType());
+    return this->emitCastPointerIntegral(T, CE);
+  }
+
   case CK_ArrayToPointerDecay:
   case CK_AtomicToNonAtomic:
   case CK_ConstructorConversion:
@@ -134,6 +143,7 @@ bool ByteCodeExprGen<Emitter>::VisitCastExpr(const CastExpr *CE) {
   case CK_NonAtomicToAtomic:
   case CK_NoOp:
   case CK_UserDefinedConversion:
+  case CK_BitCast:
     return this->visit(SubExpr);
 
   case CK_IntegralToBoolean:
@@ -595,8 +605,9 @@ bool ByteCodeExprGen<Emitter>::VisitOpaqueValueExpr(const OpaqueValueExpr *E) {
 template <class Emitter>
 bool ByteCodeExprGen<Emitter>::VisitAbstractConditionalOperator(
     const AbstractConditionalOperator *E) {
-  return this->visitConditional(
-      E, [this](const Expr *E) { return this->visit(E); });
+  return this->visitConditional(E, [this](const Expr *E) {
+    return DiscardResult ? this->discard(E) : this->visit(E);
+  });
 }
 
 template <class Emitter>
@@ -986,6 +997,32 @@ bool ByteCodeExprGen<Emitter>::VisitPredefinedExpr(const PredefinedExpr *E) {
     return true;
 
   return this->visit(E->getFunctionName());
+}
+
+template <class Emitter>
+bool ByteCodeExprGen<Emitter>::VisitCXXThrowExpr(const CXXThrowExpr *E) {
+  if (E->getSubExpr() && !this->discard(E->getSubExpr()))
+    return false;
+
+  return this->emitInvalid(E);
+}
+
+template <class Emitter>
+bool ByteCodeExprGen<Emitter>::VisitCXXReinterpretCastExpr(
+    const CXXReinterpretCastExpr *E) {
+  if (!this->discard(E->getSubExpr()))
+    return false;
+
+  return this->emitInvalidCast(CastKind::Reinterpret, E);
+}
+
+template <class Emitter>
+bool ByteCodeExprGen<Emitter>::VisitCXXNoexceptExpr(const CXXNoexceptExpr *E) {
+  assert(E->getType()->isBooleanType());
+
+  if (DiscardResult)
+    return true;
+  return this->emitConstBool(E->getValue(), E);
 }
 
 template <class Emitter> bool ByteCodeExprGen<Emitter>::discard(const Expr *E) {

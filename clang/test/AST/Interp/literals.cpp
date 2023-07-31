@@ -6,6 +6,8 @@
 #define INT_MIN (~__INT_MAX__)
 #define INT_MAX __INT_MAX__
 
+typedef __INTPTR_TYPE__ intptr_t;
+
 
 static_assert(true, "");
 static_assert(false, ""); // expected-error{{failed}} ref-error{{failed}}
@@ -118,6 +120,35 @@ namespace PointerToBool {
   constexpr const float *FP = &F;
   static_assert(FP, "");
   static_assert(!!FP, "");
+}
+
+namespace PointerComparison {
+
+  struct S { int a, b; } s;
+  constexpr void *null = 0;
+  constexpr void *pv = (void*)&s.a;
+  constexpr void *qv = (void*)&s.b;
+  constexpr bool v1 = null < (int*)0;
+  constexpr bool v2 = null < pv; // expected-error {{must be initialized by a constant expression}} \
+                                 // expected-note {{comparison between 'nullptr' and '&s.a' has unspecified value}} \
+                                 // ref-error {{must be initialized by a constant expression}} \
+                                 // ref-note {{comparison between 'nullptr' and '&s.a' has unspecified value}} \
+
+  constexpr bool v3 = null == pv; // ok
+  constexpr bool v4 = qv == pv; // ok
+
+  /// FIXME: These two are rejected by the current interpreter, but
+  ///   accepted by GCC.
+  constexpr bool v5 = qv >= pv; // ref-error {{constant expression}} \
+                                // ref-note {{unequal pointers to void}}
+  constexpr bool v8 = qv > (void*)&s.a; // ref-error {{constant expression}} \
+                                        // ref-note {{unequal pointers to void}}
+  constexpr bool v6 = qv > null; // expected-error {{must be initialized by a constant expression}} \
+                                 // expected-note {{comparison between '&s.b' and 'nullptr' has unspecified value}} \
+                                 // ref-error {{must be initialized by a constant expression}} \
+                                 // ref-note {{comparison between '&s.b' and 'nullptr' has unspecified value}}
+
+  constexpr bool v7 = qv <= (void*)&s.b; // ok
 }
 
 namespace SizeOf {
@@ -471,22 +502,22 @@ namespace IncDec {
     return 1;
   }
   static_assert(uninit<int, true>(), ""); // ref-error {{not an integral constant expression}} \
-                                          // ref-note {{in call to 'uninit()'}} \
+                                          // ref-note {{in call to 'uninit<int, true>()'}} \
                                           // expected-error {{not an integral constant expression}} \
                                           // expected-note {{in call to 'uninit()'}}
 
   static_assert(uninit<int, false>(), ""); // ref-error {{not an integral constant expression}} \
-                                           // ref-note {{in call to 'uninit()'}} \
+                                           // ref-note {{in call to 'uninit<int, false>()'}} \
                                            // expected-error {{not an integral constant expression}} \
                                            // expected-note {{in call to 'uninit()'}}
 
   static_assert(uninit<float, true>(), ""); // ref-error {{not an integral constant expression}} \
-                                            // ref-note {{in call to 'uninit()'}} \
+                                            // ref-note {{in call to 'uninit<float, true>()'}} \
                                             // expected-error {{not an integral constant expression}} \
                                             // expected-note {{in call to 'uninit()'}}
 
   static_assert(uninit<float, false>(), ""); // ref-error {{not an integral constant expression}} \
-                                             // ref-note {{in call to 'uninit()'}} \
+                                             // ref-note {{in call to 'uninit<float, false>()'}} \
                                              // expected-error {{not an integral constant expression}} \
                                              // expected-note {{in call to 'uninit()'}}
 
@@ -857,6 +888,9 @@ constexpr int ignoredExprs() {
 
   (void)5, (void)6;
 
+  1 ? 0 : 1; // expected-warning {{unused}} \
+             // ref-warning {{unused}}
+
   return 0;
 }
 
@@ -906,4 +940,38 @@ namespace PredefinedExprs {
   static_assert(heh(1) == 'e', "");
   static_assert(heh(2) == 'h', "");
 #endif
+}
+
+namespace NE {
+  constexpr int foo() noexcept {
+    return 1;
+  }
+  static_assert(noexcept(foo()), "");
+  constexpr int foo2() {
+    return 1;
+  }
+  static_assert(!noexcept(foo2()), "");
+
+#if __cplusplus > 201402L
+  constexpr int a() {
+    int b = 0;
+    (void)noexcept(++b); // expected-warning {{expression with side effects has no effect in an unevaluated context}} \
+                         // ref-warning {{expression with side effects has no effect in an unevaluated context}}
+
+    return b;
+  }
+  static_assert(a() == 0, "");
+#endif
+}
+
+namespace PointerCasts {
+  constexpr int M = 10;
+  constexpr const int *P = &M;
+  constexpr intptr_t A = (intptr_t)P; // ref-error {{must be initialized by a constant expression}} \
+                                      // ref-note {{cast that performs the conversions of a reinterpret_cast}} \
+                                      // expected-error {{must be initialized by a constant expression}} \
+                                      // expected-note {{cast that performs the conversions of a reinterpret_cast}}
+
+  int array[(intptr_t)(char*)0]; // ref-warning {{variable length array folded to constant array}} \
+                                 // expected-warning {{variable length array folded to constant array}}
 }

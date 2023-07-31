@@ -114,6 +114,8 @@ enum ProcessorSubtypes {
   AMDFAM19H_ZNVER4,
   INTEL_COREI7_GRANITERAPIDS,
   INTEL_COREI7_GRANITERAPIDS_D,
+  INTEL_COREI7_ARROWLAKE,
+  INTEL_COREI7_ARROWLAKE_S,
   CPU_SUBTYPE_MAX
 };
 
@@ -449,12 +451,30 @@ getIntelProcessorTypeAndSubtype(unsigned Family, unsigned Model,
     case 0x9a:
     // Raptorlake:
     case 0xb7:
+    case 0xba:
+    case 0xbf:
     // Meteorlake:
     case 0xaa:
     case 0xac:
       CPU = "alderlake";
       *Type = INTEL_COREI7;
       *Subtype = INTEL_COREI7_ALDERLAKE;
+      break;
+
+    // Arrowlake:
+    case 0xc5:
+      CPU = "arrowlake";
+      *Type = INTEL_COREI7;
+      *Subtype = INTEL_COREI7_ARROWLAKE;
+      break;
+
+    // Arrowlake S:
+    case 0xc6:
+    // Lunarlake:
+    case 0xbd:
+      CPU = "arrowlake-s";
+      *Type = INTEL_COREI7;
+      *Subtype = INTEL_COREI7_ARROWLAKE_S;
       break;
 
     // Icelake Xeon:

@@ -139,6 +139,7 @@ declare_mlir_dialect_extension_python_bindings(
   ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mlir"
   TD_FILE dialects/BufferizationTransformOps.td
   SOURCES
+    dialects/_bufferization_transform_ops_ext.py
     dialects/transform/bufferization.py
   DIALECT_NAME transform
   EXTENSION_NAME bufferization_transform)
@@ -162,6 +163,15 @@ declare_mlir_dialect_extension_python_bindings(
     dialects/transform/loop.py
   DIALECT_NAME transform
   EXTENSION_NAME loop_transform)
+
+declare_mlir_dialect_extension_python_bindings(
+  ADD_TO_PARENT MLIRPythonSources.Dialects
+  ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mlir"
+  TD_FILE dialects/MemRefTransformOps.td
+  SOURCES
+    dialects/transform/memref.py
+  DIALECT_NAME transform
+  EXTENSION_NAME memref_transform)
 
 declare_mlir_dialect_extension_python_bindings(
   ADD_TO_PARENT MLIRPythonSources.Dialects

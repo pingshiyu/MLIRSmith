@@ -36,6 +36,7 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/PostOrderIterator.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/Statistic.h"
@@ -145,6 +146,8 @@ static cl::opt<unsigned> MaxSinkNumUsers(
     "instcombine-max-sink-users", cl::init(32),
     cl::desc("Maximum number of undroppable users for instruction sinking"));
 
+// FIXME: Remove this option, it has been superseded by verify-fixpoint.
+// Only keeping it for now to avoid unnecessary test churn in this patch.
 static cl::opt<unsigned> InfiniteLoopDetectionThreshold(
     "instcombine-infinite-loop-threshold",
     cl::desc("Number of instruction combining iterations considered an "
@@ -2748,7 +2751,8 @@ Instruction *InstCombinerImpl::visitUnconditionalBranchInst(BranchInst &BI) {
 
 // Under the assumption that I is unreachable, remove it and following
 // instructions.
-bool InstCombinerImpl::handleUnreachableFrom(Instruction *I) {
+bool InstCombinerImpl::handleUnreachableFrom(
+    Instruction *I, SmallVectorImpl<BasicBlock *> &Worklist) {
   bool Changed = false;
   BasicBlock *BB = I->getParent();
   for (Instruction &Inst : make_early_inc_range(
@@ -2774,27 +2778,41 @@ bool InstCombinerImpl::handleUnreachableFrom(Instruction *I) {
           Changed = true;
         }
 
-  // TODO: Successor blocks may also be dead.
+  // Handle potentially dead successors.
+  for (BasicBlock *Succ : successors(BB))
+    if (DeadEdges.insert({BB, Succ}).second)
+      Worklist.push_back(Succ);
+  return Changed;
+}
+
+bool InstCombinerImpl::handlePotentiallyDeadBlocks(
+    SmallVectorImpl<BasicBlock *> &Worklist) {
+  bool Changed = false;
+  while (!Worklist.empty()) {
+    BasicBlock *BB = Worklist.pop_back_val();
+    if (!all_of(predecessors(BB), [&](BasicBlock *Pred) {
+          return DeadEdges.contains({Pred, BB}) || DT.dominates(BB, Pred);
+        }))
+      continue;
+
+    Changed |= handleUnreachableFrom(&BB->front(), Worklist);
+  }
   return Changed;
 }
 
 bool InstCombinerImpl::handlePotentiallyDeadSuccessors(BasicBlock *BB,
                                                        BasicBlock *LiveSucc) {
-  bool Changed = false;
+  SmallVector<BasicBlock *> Worklist;
   for (BasicBlock *Succ : successors(BB)) {
     // The live successor isn't dead.
     if (Succ == LiveSucc)
       continue;
 
-    if (!all_of(predecessors(Succ), [&](BasicBlock *Pred) {
-          return DT.dominates(BasicBlockEdge(BB, Succ),
-                              BasicBlockEdge(Pred, Succ));
-        }))
-      continue;
-
-    Changed |= handleUnreachableFrom(&Succ->front());
+    if (DeadEdges.insert({BB, Succ}).second)
+      Worklist.push_back(Succ);
   }
-  return Changed;
+
+  return handlePotentiallyDeadBlocks(Worklist);
 }
 
 Instruction *InstCombinerImpl::visitBranchInst(BranchInst &BI) {
@@ -4093,31 +4111,29 @@ public:
   }
 };
 
-/// Populate the IC worklist from a function, by walking it in depth-first
-/// order and adding all reachable code to the worklist.
+/// Populate the IC worklist from a function, by walking it in reverse
+/// post-order and adding all reachable code to the worklist.
 ///
 /// This has a couple of tricks to make the code faster and more powerful.  In
 /// particular, we constant fold and DCE instructions as we go, to avoid adding
 /// them to the worklist (this significantly speeds up instcombine on code where
 /// many instructions are dead or constant).  Additionally, if we find a branch
 /// whose condition is a known constant, we only visit the reachable successors.
-static bool prepareICWorklistFromFunction(Function &F, const DataLayout &DL,
-                                          const TargetLibraryInfo *TLI,
-                                          InstructionWorklist &ICWorklist) {
+static bool
+prepareICWorklistFromFunction(Function &F, const DataLayout &DL,
+                              const TargetLibraryInfo *TLI,
+                              InstructionWorklist &ICWorklist,
+                              ReversePostOrderTraversal<BasicBlock *> &RPOT) {
   bool MadeIRChange = false;
-  SmallPtrSet<BasicBlock *, 32> Visited;
-  SmallVector<BasicBlock*, 256> Worklist;
-  Worklist.push_back(&F.front());
+  SmallPtrSet<BasicBlock *, 32> LiveBlocks;
+  LiveBlocks.insert(&F.front());
 
   SmallVector<Instruction *, 128> InstrsForInstructionWorklist;
   DenseMap<Constant *, Constant *> FoldedConstants;
   AliasScopeTracker SeenAliasScopes;
 
-  do {
-    BasicBlock *BB = Worklist.pop_back_val();
-
-    // We have now visited this block!  If we've already been here, ignore it.
-    if (!Visited.insert(BB).second)
+  for (BasicBlock *BB : RPOT) {
+    if (!LiveBlocks.count(BB))
       continue;
 
     for (Instruction &Inst : llvm::make_early_inc_range(*BB)) {
@@ -4163,8 +4179,8 @@ static bool prepareICWorklistFromFunction(Function &F, const DataLayout &DL,
       }
     }
 
-    // Recursively visit successors.  If this is a branch or switch on a
-    // constant, only visit the reachable successor.
+    // If this is a branch or switch on a constant, mark only the single
+    // live successor. Otherwise assume all successors are live.
     Instruction *TI = BB->getTerminator();
     if (BranchInst *BI = dyn_cast<BranchInst>(TI); BI && BI->isConditional()) {
       if (isa<UndefValue>(BI->getCondition()))
@@ -4173,7 +4189,7 @@ static bool prepareICWorklistFromFunction(Function &F, const DataLayout &DL,
       if (auto *Cond = dyn_cast<ConstantInt>(BI->getCondition())) {
         bool CondVal = Cond->getZExtValue();
         BasicBlock *ReachableBB = BI->getSuccessor(!CondVal);
-        Worklist.push_back(ReachableBB);
+        LiveBlocks.insert(ReachableBB);
         continue;
       }
     } else if (SwitchInst *SI = dyn_cast<SwitchInst>(TI)) {
@@ -4181,19 +4197,20 @@ static bool prepareICWorklistFromFunction(Function &F, const DataLayout &DL,
         // Switch on undef is UB.
         continue;
       if (auto *Cond = dyn_cast<ConstantInt>(SI->getCondition())) {
-        Worklist.push_back(SI->findCaseValue(Cond)->getCaseSuccessor());
+        LiveBlocks.insert(SI->findCaseValue(Cond)->getCaseSuccessor());
         continue;
       }
     }
 
-    append_range(Worklist, successors(TI));
-  } while (!Worklist.empty());
+    for (BasicBlock *SuccBB : successors(TI))
+      LiveBlocks.insert(SuccBB);
+  }
 
   // Remove instructions inside unreachable blocks. This prevents the
   // instcombine code from having to deal with some bad special cases, and
   // reduces use counts of instructions.
   for (BasicBlock &BB : F) {
-    if (Visited.count(&BB))
+    if (LiveBlocks.count(&BB))
       continue;
 
     unsigned NumDeadInstInBB;
@@ -4234,7 +4251,8 @@ static bool combineInstructionsOverFunction(
     Function &F, InstructionWorklist &Worklist, AliasAnalysis *AA,
     AssumptionCache &AC, TargetLibraryInfo &TLI, TargetTransformInfo &TTI,
     DominatorTree &DT, OptimizationRemarkEmitter &ORE, BlockFrequencyInfo *BFI,
-    ProfileSummaryInfo *PSI, unsigned MaxIterations, LoopInfo *LI) {
+    ProfileSummaryInfo *PSI, unsigned MaxIterations, bool VerifyFixpoint,
+    LoopInfo *LI) {
   auto &DL = F.getParent()->getDataLayout();
 
   /// Builder - This is an IRBuilder that automatically inserts new
@@ -4247,6 +4265,8 @@ static bool combineInstructionsOverFunction(
           AC.registerAssumption(Assume);
       }));
 
+  ReversePostOrderTraversal<BasicBlock *> RPOT(&F.front());
+
   // Lower dbg.declare intrinsics otherwise their value may be clobbered
   // by instcombiner.
   bool MadeIRChange = false;
@@ -4256,35 +4276,35 @@ static bool combineInstructionsOverFunction(
   // Iterate while there is work to do.
   unsigned Iteration = 0;
   while (true) {
-    ++NumWorklistIterations;
     ++Iteration;
 
-    if (Iteration > InfiniteLoopDetectionThreshold) {
-      report_fatal_error(
-          "Instruction Combining seems stuck in an infinite loop after " +
-          Twine(InfiniteLoopDetectionThreshold) + " iterations.");
-    }
-
-    if (Iteration > MaxIterations) {
+    if (Iteration > MaxIterations && !VerifyFixpoint) {
       LLVM_DEBUG(dbgs() << "\n\n[IC] Iteration limit #" << MaxIterations
                         << " on " << F.getName()
-                        << " reached; stopping before reaching a fixpoint\n");
+                        << " reached; stopping without verifying fixpoint\n");
       break;
     }
 
+    ++NumWorklistIterations;
     LLVM_DEBUG(dbgs() << "\n\nINSTCOMBINE ITERATION #" << Iteration << " on "
                       << F.getName() << "\n");
 
-    MadeIRChange |= prepareICWorklistFromFunction(F, DL, &TLI, Worklist);
+    bool MadeChangeInThisIteration =
+        prepareICWorklistFromFunction(F, DL, &TLI, Worklist, RPOT);
 
     InstCombinerImpl IC(Worklist, Builder, F.hasMinSize(), AA, AC, TLI, TTI, DT,
                         ORE, BFI, PSI, DL, LI);
     IC.MaxArraySizeForCombine = MaxArraySize;
-
-    if (!IC.run())
+    MadeChangeInThisIteration |= IC.run();
+    if (!MadeChangeInThisIteration)
       break;
 
     MadeIRChange = true;
+    if (Iteration > MaxIterations) {
+      report_fatal_error(
+          "Instruction Combining did not reach a fixpoint after " +
+          Twine(MaxIterations) + " iterations");
+    }
   }
 
   if (Iteration == 1)
@@ -4307,7 +4327,8 @@ void InstCombinePass::printPipeline(
       OS, MapClassName2PassName);
   OS << '<';
   OS << "max-iterations=" << Options.MaxIterations << ";";
-  OS << (Options.UseLoopInfo ? "" : "no-") << "use-loop-info";
+  OS << (Options.UseLoopInfo ? "" : "no-") << "use-loop-info;";
+  OS << (Options.VerifyFixpoint ? "" : "no-") << "verify-fixpoint";
   OS << '>';
 }
 
@@ -4333,7 +4354,8 @@ PreservedAnalyses InstCombinePass::run(Function &F,
       &AM.getResult<BlockFrequencyAnalysis>(F) : nullptr;
 
   if (!combineInstructionsOverFunction(F, Worklist, AA, AC, TLI, TTI, DT, ORE,
-                                       BFI, PSI, Options.MaxIterations, LI))
+                                       BFI, PSI, Options.MaxIterations,
+                                       Options.VerifyFixpoint, LI))
     // No changes, all analyses are preserved.
     return PreservedAnalyses::all();
 
@@ -4383,7 +4405,8 @@ bool InstructionCombiningPass::runOnFunction(Function &F) {
 
   return combineInstructionsOverFunction(F, Worklist, AA, AC, TLI, TTI, DT, ORE,
                                          BFI, PSI,
-                                         InstCombineDefaultMaxIterations, LI);
+                                         InstCombineDefaultMaxIterations,
+                                         /*VerifyFixpoint */ false, LI);
 }
 
 char InstructionCombiningPass::ID = 0;

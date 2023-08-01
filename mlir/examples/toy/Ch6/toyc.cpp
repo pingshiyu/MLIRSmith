@@ -285,7 +285,7 @@ int main(int argc, char **argv) {
   mlir::registerPassManagerCLOptions();
 
   cl::ParseCommandLineOptions(argc, argv, "toy compiler\n");
-  llvm::InitLLVM(argc, argv);
+//  llvm::InitLLVM(argc, argv);
 
   if (emitAction == Action::DumpAST)
     return dumpAST();

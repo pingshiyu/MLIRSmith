@@ -36,6 +36,7 @@ add_toy_chapter(toyc-ch5
   smith/TypedValuePool.cpp
   smith/TypeValue.cpp
   smith/generators/AffineGeneratorProvider.cpp
+  smith/OpPrinterPass.cpp
   DEPENDS
   ToyCh5ShapeInferenceInterfaceIncGen
   ToyCh5OpsIncGen

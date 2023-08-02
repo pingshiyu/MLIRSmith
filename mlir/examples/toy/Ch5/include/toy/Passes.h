@@ -25,6 +25,8 @@ std::unique_ptr<Pass> createShapeInferencePass();
 /// for a subset of the Toy IR (e.g. matmul).
 std::unique_ptr<mlir::Pass> createLowerToAffinePass();
 
+std::unique_ptr<mlir::Pass> createOpPrinterPass();
+
 // Entrance of generating Linalg operations.
 std::unique_ptr<mlir::Pass> createLinalgPass();
 

@@ -564,18 +564,6 @@ public:
 
   bool createHostAssociateVarClone(
       const Fortran::semantics::Symbol &sym) override final {
-    bool success{false};
-    if (const auto *commonDet =
-            sym.detailsIf<Fortran::semantics::CommonBlockDetails>()) {
-      for (const auto &mem : commonDet->objects())
-        success = genHostAssociateVarClone(*mem);
-    } else {
-      success = genHostAssociateVarClone(sym);
-    }
-    return success;
-  }
-
-  bool genHostAssociateVarClone(const Fortran::semantics::Symbol &sym) {
     mlir::Location loc = genLocation(sym.name());
     mlir::Type symType = genType(sym);
     const auto *details = sym.detailsIf<Fortran::semantics::HostAssocDetails>();
@@ -2242,7 +2230,7 @@ private:
   void genFIR(const Fortran::parser::OpenACCDeclarativeConstruct &accDecl) {
     mlir::OpBuilder::InsertPoint insertPt = builder->saveInsertionPoint();
     genOpenACCDeclarativeConstruct(*this, bridge.getSemanticsContext(),
-                                   getEval(), accDecl);
+                                   bridge.fctCtx(), getEval(), accDecl);
     for (Fortran::lower::pft::Evaluation &e : getEval().getNestedEvaluations())
       genFIR(e);
     builder->restoreInsertionPoint(insertPt);

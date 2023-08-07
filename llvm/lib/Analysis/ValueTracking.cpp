@@ -2018,7 +2018,8 @@ bool isKnownToBeAPowerOfTwo(const Value *V, bool OrZero, unsigned Depth,
       return true;
   if (match(V, m_Power2()))
       return true;
-  if (Q.CxtI && match(V, m_VScale())) {
+  if (Q.CxtI &&
+      (match(V, m_VScale()) || match(V, m_Shl(m_VScale(), m_Value())))) {
     const Function *F = Q.CxtI->getFunction();
     // The vscale_range indicates vscale is a power-of-two.
     return F->hasFnAttribute(Attribute::VScaleRange);
@@ -3649,6 +3650,8 @@ Intrinsic::ID llvm::getIntrinsicForCallSite(const CallBase &CB,
   return Intrinsic::not_intrinsic;
 }
 
+/// Deprecated, use computeKnownFPClass instead.
+///
 /// If \p SignBitOnly is true, test for a known 0 sign bit rather than a
 /// standard ordered compare. e.g. make -0.0 olt 0.0 be true because of the sign
 /// bit despite comparing equal.
@@ -3840,13 +3843,9 @@ static bool cannotBeOrderedLessThanZeroImpl(const Value *V,
   return false;
 }
 
-bool llvm::CannotBeOrderedLessThanZero(const Value *V, const DataLayout &DL,
-                                       const TargetLibraryInfo *TLI) {
-  return cannotBeOrderedLessThanZeroImpl(V, DL, TLI, false, 0);
-}
-
 bool llvm::SignBitMustBeZero(const Value *V, const DataLayout &DL,
                              const TargetLibraryInfo *TLI) {
+  // FIXME: Use computeKnownFPClass and pass all arguments
   return cannotBeOrderedLessThanZeroImpl(V, DL, TLI, true, 0);
 }
 
@@ -6756,7 +6755,9 @@ static bool isGuaranteedNotToBeUndefOrPoison(const Value *V,
       return true;
 
     if (const auto *CB = dyn_cast<CallBase>(V)) {
-      if (CB->hasRetAttr(Attribute::NoUndef))
+      if (CB->hasRetAttr(Attribute::NoUndef) ||
+          CB->hasRetAttr(Attribute::Dereferenceable) ||
+          CB->hasRetAttr(Attribute::DereferenceableOrNull))
         return true;
     }
 

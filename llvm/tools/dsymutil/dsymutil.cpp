@@ -71,6 +71,7 @@ enum ID {
 #include "Options.inc"
 #undef PREFIX
 
+using namespace llvm::opt;
 static constexpr opt::OptTable::Info InfoTable[] = {
 #define OPTION(...) LLVM_CONSTRUCT_OPT_INFO(__VA_ARGS__),
 #include "Options.inc"
@@ -594,7 +595,7 @@ getOutputFileName(StringRef InputFile, const DsymutilOptions &Options) {
   return OutputLocation(std::string(Path.str()), ResourceDir);
 }
 
-int main(int argc, char **argv) {
+int dsymutil_main(int argc, char **argv, const llvm::ToolContext &) {
   InitLLVM X(argc, argv);
 
   // Parse arguments.

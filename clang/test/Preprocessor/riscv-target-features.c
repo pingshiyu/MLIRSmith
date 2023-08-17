@@ -16,8 +16,6 @@
 // CHECK-NOT: __riscv_fsqrt {{.*$}}
 // CHECK-NOT: __riscv_c {{.*$}}
 // CHECK-NOT: __riscv_compressed {{.*$}}
-// CHECK-NOT: __riscv_b {{.*$}}
-// CHECK-NOT: __riscv_bitmanip {{.*$}}
 // CHECK-NOT: __riscv_zihintntl {{.*$}}
 // CHECK-NOT: __riscv_zba {{.*$}}
 // CHECK-NOT: __riscv_zbb {{.*$}}
@@ -73,6 +71,7 @@
 // CHECK-NOT: __riscv_zvfbfmin {{.*$}}
 // CHECK-NOT: __riscv_zvfbfwma {{.*$}}
 // CHECK-NOT: __riscv_zacas {{.*$}}
+// CHECK-NOT: __riscv_zicfilp {{.*$}}
 
 // RUN: %clang -target riscv32-unknown-linux-gnu -march=rv32i -x c -E -dM %s \
 // RUN: -o - | FileCheck %s
@@ -145,13 +144,13 @@
 // CHECK-C-EXT: __riscv_c 2000000{{$}}
 // CHECK-C-EXT: __riscv_compressed 1
 
-// RUN: %clang -target riscv32-unknown-linux-gnu -menable-experimental-extensions \
-// RUN: -march=rv32izihintntl0p2 -x c -E -dM %s \
-// RUN: -o - | FileCheck --check-prefix=CHECK-ZIHINTNTL-EXT %s
-// RUN: %clang -target riscv64-unknown-linux-gnu -menable-experimental-extensions \
-// RUN: -march=rv64izihintntl0p2 -x c -E -dM %s \
-// RUN: -o - | FileCheck --check-prefix=CHECK-ZIHINTNTL-EXT %s
-// CHECK-ZIHINTNTL-EXT: __riscv_zihintntl 2000{{$}}
+// RUN: %clang -target riscv32-unknown-linux-gnu \
+// RUN: -march=rv32izihintntl1p0 -x c -E -dM %s \
+// RUN: -o - | FileCheck --check-prefix=CHECK-ZIHINTNTL %s
+// RUN: %clang -target riscv64-unknown-linux-gnu \
+// RUN: -march=rv64izihintntl1p0 -x c -E -dM %s \
+// RUN: -o - | FileCheck --check-prefix=CHECK-ZIHINTNTL %s
+// CHECK-ZIHINTNTL: __riscv_zihintntl 1000000{{$}}
 
 // RUN: %clang -target riscv32-unknown-linux-gnu \
 // RUN: -march=rv32izba1p0 -x c -E -dM %s \
@@ -165,7 +164,6 @@
 // RUN: %clang -target riscv64-unknown-linux-gnu \
 // RUN: -march=rv64izba -x c -E -dM %s \
 // RUN: -o - | FileCheck --check-prefix=CHECK-ZBA-EXT %s
-// CHECK-ZBA-NOT: __riscv_b
 // CHECK-ZBA-EXT: __riscv_zba 1000000{{$}}
 
 // RUN: %clang -target riscv32-unknown-linux-gnu \
@@ -180,7 +178,6 @@
 // RUN: %clang -target riscv64-unknown-linux-gnu \
 // RUN: -march=rv64izbb -x c -E -dM %s \
 // RUN: -o - | FileCheck --check-prefix=CHECK-ZBB-EXT %s
-// CHECK-ZBB-NOT: __riscv_b
 // CHECK-ZBB-EXT: __riscv_zbb 1000000{{$}}
 
 // RUN: %clang -target riscv32-unknown-linux-gnu \
@@ -195,7 +192,6 @@
 // RUN: %clang -target riscv64-unknown-linux-gnu \
 // RUN: -march=rv64izbc -x c -E -dM %s \
 // RUN: -o - | FileCheck --check-prefix=CHECK-ZBC-EXT %s
-// CHECK-ZBC-NOT: __riscv_b
 // CHECK-ZBC-EXT: __riscv_zbc 1000000{{$}}
 
 // RUN: %clang -target riscv32-unknown-linux-gnu \
@@ -210,7 +206,6 @@
 // RUN: %clang -target riscv64-unknown-linux-gnu \
 // RUN: -march=rv64izbs -x c -E -dM %s \
 // RUN: -o - | FileCheck --check-prefix=CHECK-ZBS-EXT %s
-// CHECK-ZBS-NOT: __riscv_b
 // CHECK-ZBS-EXT: __riscv_zbs 1000000{{$}}
 
 // RUN: %clang -target riscv32-unknown-linux-gnu \
@@ -780,3 +775,11 @@
 // RUN: -march=rv64i_zacas1p0 -x c -E -dM %s \
 // RUN: -o - | FileCheck --check-prefix=CHECK-ZACAS-EXT %s
 // CHECK-ZACAS-EXT: __riscv_zacas 1000000{{$}}
+
+// RUN: %clang -target riscv32 -menable-experimental-extensions \
+// RUN: -march=rv32i_zicfilp0p2 -x c -E -dM %s \
+// RUN: -o - | FileCheck --check-prefix=CHECK-ZICFILP-EXT %s
+// RUN: %clang -target riscv64 -menable-experimental-extensions \
+// RUN: -march=rv64i_zicfilp0p2 -x c -E -dM %s \
+// RUN: -o - | FileCheck --check-prefix=CHECK-ZICFILP-EXT %s
+// CHECK-ZICFILP-EXT: __riscv_zicfilp 2000{{$}}

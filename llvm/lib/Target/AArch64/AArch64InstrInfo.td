@@ -262,6 +262,8 @@ def UseNegativeImmediates
 
 def UseScalarIncVL : Predicate<"Subtarget->useScalarIncVL()">;
 
+def UseSVEFPLD1R : Predicate<"!Subtarget->noSVEFPLD1R()">;
+
 def IsNeonAvailable : Predicate<"Subtarget->isNeonAvailable()">;
 
 def AArch64LocalRecover : SDNode<"ISD::LOCAL_RECOVER",
@@ -819,6 +821,12 @@ def AArch64tbl : SDNode<"AArch64ISD::TBL", SDT_AArch64TBL>;
 def AArch64mrs : SDNode<"AArch64ISD::MRS",
                         SDTypeProfile<1, 1, [SDTCisVT<0, i64>, SDTCisVT<1, i32>]>,
                         [SDNPHasChain, SDNPOutGlue]>;
+
+def SD_AArch64rshrnb : SDTypeProfile<1, 2, [SDTCisVec<0>, SDTCisVec<1>, SDTCisInt<2>]>;
+def AArch64rshrnb : SDNode<"AArch64ISD::RSHRNB_I", SD_AArch64rshrnb>;
+def AArch64rshrnb_pf : PatFrags<(ops node:$rs, node:$i),
+                            [(AArch64rshrnb node:$rs, node:$i),
+                            (int_aarch64_sve_rshrnb node:$rs, node:$i)]>;
 
 // Match add node and also treat an 'or' node is as an 'add' if the or'ed operands
 // have no common bits.
@@ -4339,6 +4347,34 @@ def : Pat<(i64 (any_llround f64:$Rn)),
 
 defm SCVTF : IntegerToFP<0, "scvtf", any_sint_to_fp>;
 defm UCVTF : IntegerToFP<1, "ucvtf", any_uint_to_fp>;
+
+def : Pat<(f16 (fdiv (f16 (any_sint_to_fp (i32 GPR32:$Rn))), fixedpoint_f16_i32:$scale)),
+          (SCVTFSWHri GPR32:$Rn, fixedpoint_f16_i32:$scale)>;
+def : Pat<(f32 (fdiv (f32 (any_sint_to_fp (i32 GPR32:$Rn))), fixedpoint_f32_i32:$scale)),
+          (SCVTFSWSri GPR32:$Rn, fixedpoint_f32_i32:$scale)>;
+def : Pat<(f64 (fdiv (f64 (any_sint_to_fp (i32 GPR32:$Rn))), fixedpoint_f64_i32:$scale)),
+          (SCVTFSWDri GPR32:$Rn, fixedpoint_f64_i32:$scale)>;
+
+def : Pat<(f16 (fdiv (f16 (any_sint_to_fp (i64 GPR64:$Rn))), fixedpoint_f16_i64:$scale)),
+          (SCVTFSXHri GPR64:$Rn, fixedpoint_f16_i64:$scale)>;
+def : Pat<(f32 (fdiv (f32 (any_sint_to_fp (i64 GPR64:$Rn))), fixedpoint_f32_i64:$scale)),
+          (SCVTFSXSri GPR64:$Rn, fixedpoint_f32_i64:$scale)>;
+def : Pat<(f64 (fdiv (f64 (any_sint_to_fp (i64 GPR64:$Rn))), fixedpoint_f64_i64:$scale)),
+          (SCVTFSXDri GPR64:$Rn, fixedpoint_f64_i64:$scale)>;
+
+def : Pat<(f16 (fdiv (f16 (any_uint_to_fp (i64 GPR64:$Rn))), fixedpoint_f16_i64:$scale)),
+          (UCVTFSXHri GPR64:$Rn, fixedpoint_f16_i64:$scale)>;
+def : Pat<(f32 (fdiv (f32 (any_uint_to_fp (i64 GPR64:$Rn))), fixedpoint_f32_i64:$scale)),
+          (UCVTFSXSri GPR64:$Rn, fixedpoint_f32_i64:$scale)>;
+def : Pat<(f64 (fdiv (f64 (any_uint_to_fp (i64 GPR64:$Rn))), fixedpoint_f64_i64:$scale)),
+          (UCVTFSXDri GPR64:$Rn, fixedpoint_f64_i64:$scale)>;
+
+def : Pat<(f16 (fdiv (f16 (any_uint_to_fp (i32 GPR32:$Rn))), fixedpoint_f16_i32:$scale)),
+          (UCVTFSWHri GPR32:$Rn, fixedpoint_f16_i32:$scale)>;
+def : Pat<(f32 (fdiv (f32 (any_uint_to_fp (i32 GPR32:$Rn))), fixedpoint_f32_i32:$scale)),
+          (UCVTFSWSri GPR32:$Rn, fixedpoint_f32_i32:$scale)>;
+def : Pat<(f64 (fdiv (f64 (any_uint_to_fp (i32 GPR32:$Rn))), fixedpoint_f64_i32:$scale)),
+          (UCVTFSWDri GPR32:$Rn, fixedpoint_f64_i32:$scale)>;
 
 //===----------------------------------------------------------------------===//
 // Unscaled integer to floating point conversion instruction.

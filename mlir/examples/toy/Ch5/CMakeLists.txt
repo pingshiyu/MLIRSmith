@@ -28,6 +28,7 @@ add_toy_chapter(toyc-ch5
   smith/generators/MemrefGeneratorProvider.cpp
   smith/generators/FuncGeneratorProvider.cpp
   smith/generators/SCFGeneratorProvider.cpp
+  smith/generators/SPIRVGeneratorProvider.cpp
   smith/generators/TensorGeneratorProvider.cpp
   smith/generators/VectorGeneratorProvider.cpp
   smith/ValueGeneration.cpp

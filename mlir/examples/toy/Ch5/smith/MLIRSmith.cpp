@@ -4,6 +4,7 @@
 
 #include "smith/MLIRSmith.h"
 #include "mlir/Dialect/Index/IR/IndexDialect.h"
+#include "mlir/Dialect/SPIRV/IR/SPIRVDialect.h"
 
 using namespace mlir;
 
@@ -112,11 +113,11 @@ struct MLIRSmithPass
   MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(MLIRSmithPass)
 
   void getDependentDialects(DialectRegistry &registry) const override {
-    registry.insert<scf::SCFDialect, linalg::LinalgDialect, affine::AffineDialect,
-                    arith::ArithDialect, index::IndexDialect,
-                    memref::MemRefDialect, BuiltinDialect, math::MathDialect,
-                    bufferization::BufferizationDialect, func::FuncDialect,
-                    vector::VectorDialect>();
+    registry.insert<
+        scf::SCFDialect, linalg::LinalgDialect, affine::AffineDialect,
+        arith::ArithDialect, index::IndexDialect, memref::MemRefDialect,
+        BuiltinDialect, math::MathDialect, bufferization::BufferizationDialect,
+        func::FuncDialect, vector::VectorDialect, spirv::SPIRVDialect>();
   }
   void runOnOperation() final;
 };
@@ -130,12 +131,12 @@ void MLIRSmithPass::runOnOperation() {
   // We define the specific operations, or dialects, that are legal targets for
   // this lowering. In our case, we are lowering to a combination of the
   // `Affine`, `Arithmetic`, `MemRef`, and `Standard` dialects.
-  target.addLegalDialect<scf::SCFDialect, linalg::LinalgDialect,  affine::AffineDialect,
-                         arith::ArithDialect, memref::MemRefDialect,
-                         math::MathDialect, func::FuncDialect,
-                         index::IndexDialect, BuiltinDialect,
-                         bufferization::BufferizationDialect,
-                         tensor::TensorDialect, vector::VectorDialect>();
+  target.addLegalDialect<
+      scf::SCFDialect, linalg::LinalgDialect, affine::AffineDialect,
+      arith::ArithDialect, memref::MemRefDialect, math::MathDialect,
+      func::FuncDialect, index::IndexDialect, BuiltinDialect,
+      bufferization::BufferizationDialect, tensor::TensorDialect,
+      vector::VectorDialect, spirv::SPIRVDialect>();
 
   // We also define the Toy dialect as Illegal so that the conversion will fail
   // if any of these operations are *not* converted. Given that we actually want

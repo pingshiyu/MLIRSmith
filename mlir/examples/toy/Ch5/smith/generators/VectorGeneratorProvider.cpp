@@ -90,7 +90,8 @@ OpGenerator vectorCompressStoreGenerator() {
         {PoolType::Vector}, [&](TypeValue tVal) {
           auto vType = tVal.type.dyn_cast<VectorType>();
           return vType.getElementType() == builder.getI1Type() &&
-                 vType.getRank() == 1 && vType.getDimSize(0) == vecTy.getDimSize(0);
+                 vType.getRank() == 1 &&
+                 vType.getDimSize(0) == vecTy.getDimSize(0);
         });
     if (maskCandidates.empty()) {
       auto vectorTy =
@@ -367,25 +368,16 @@ OpGenerator vectorExtractGenerator() {
     auto vectorOperand =
         sampleTypedValueFrom(vectorCandidates, "vector.extract");
     auto vectorTy = vectorOperand.type.dyn_cast<VectorType>();
-    SmallVector<int64_t> indices;
+    SmallVector<Value> indices;
     auto indicesSize =
         max(1, UR(vectorTy.getRank())); // at least extract 1 dim.
     for (int i = 0; i < indicesSize; ++i) {
-      indices.push_back(UR(vectorTy.getDimSize(i)));
+      auto idx = UR(vectorTy.getDimSize(i));
+      indices.push_back(region.pool.getConstantIndex(builder, loc, idx));
     }
-    auto arrAttr = vector::getVectorSubscriptAttr(builder, indices);
-    Type resultTy;
-    if ((int)indices.size() == vectorTy.getRank()) {
-      resultTy = vectorTy.getElementType();
-    } else {
-      auto n = std::min<size_t>(indicesSize, vectorTy.getRank() - 1);
-      resultTy = VectorType::get(vectorTy.getShape().drop_front(n),
-                                 vectorTy.getElementType());
-    }
-
     auto res =
-        builder.create<vector::ExtractOp>(loc, vectorOperand.val, arrAttr);
-    auto tVal = TypeValue(resultTy, res);
+        builder.create<vector::ExtractOp>(loc, vectorOperand.val, indices);
+    auto tVal = TypeValue(res.getType(), res);
     region.pool.addVector(tVal, "vector.extract");
     return res.getOperation();
   };

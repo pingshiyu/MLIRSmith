@@ -1608,3 +1608,62 @@ define i64 @xor_i8_to_i64_shl_save_and_ne(i8 %x, i64 %y) {
   %r = select i1 %cmp, i64 %z, i64 %y
   ret i64 %r
 }
+
+define i32 @select_icmp_eq_and_1_0_srem_2_fail_null_identity(i32 %x, i32 %y) {
+; CHECK-LABEL: @select_icmp_eq_and_1_0_srem_2_fail_null_identity(
+; CHECK-NEXT:    [[AND:%.*]] = and i32 [[X:%.*]], 1
+; CHECK-NEXT:    [[CMP:%.*]] = icmp eq i32 [[AND]], 0
+; CHECK-NEXT:    [[XOR:%.*]] = srem i32 [[Y:%.*]], 2
+; CHECK-NEXT:    [[SELECT:%.*]] = select i1 [[CMP]], i32 [[Y]], i32 [[XOR]]
+; CHECK-NEXT:    ret i32 [[SELECT]]
+;
+  %and = and i32 %x, 1
+  %cmp = icmp eq i32 %and, 0
+  %xor = srem i32 %y, 2
+  %select = select i1 %cmp, i32 %y, i32 %xor
+  ret i32 %select
+}
+
+
+define i32 @select_icmp_eq_and_1_0_sdiv_2_fail_null_1_identity(i32 %x, i32 %y) {
+; CHECK-LABEL: @select_icmp_eq_and_1_0_sdiv_2_fail_null_1_identity(
+; CHECK-NEXT:    [[AND:%.*]] = and i32 [[X:%.*]], 1
+; CHECK-NEXT:    [[CMP:%.*]] = icmp eq i32 [[AND]], 0
+; CHECK-NEXT:    [[XOR:%.*]] = sdiv i32 [[Y:%.*]], 2
+; CHECK-NEXT:    [[SELECT:%.*]] = select i1 [[CMP]], i32 [[Y]], i32 [[XOR]]
+; CHECK-NEXT:    ret i32 [[SELECT]]
+;
+  %and = and i32 %x, 1
+  %cmp = icmp eq i32 %and, 0
+  %xor = sdiv i32 %y, 2
+  %select = select i1 %cmp, i32 %y, i32 %xor
+  ret i32 %select
+}
+
+define i8 @select_icmp_eq_and_1_0_lshr_fv(i8 %x, i8 %y) {
+; CHECK-LABEL: @select_icmp_eq_and_1_0_lshr_fv(
+; CHECK-NEXT:    [[AND:%.*]] = shl i8 [[X:%.*]], 1
+; CHECK-NEXT:    [[TMP1:%.*]] = and i8 [[AND]], 2
+; CHECK-NEXT:    [[SELECT:%.*]] = lshr i8 [[Y:%.*]], [[TMP1]]
+; CHECK-NEXT:    ret i8 [[SELECT]]
+;
+  %and = and i8 %x, 1
+  %cmp = icmp eq i8 %and, 0
+  %blshr = lshr i8 %y, 2
+  %select = select i1 %cmp, i8 %y, i8 %blshr
+  ret i8 %select
+}
+
+define i8 @select_icmp_eq_and_1_0_lshr_tv(i8 %x, i8 %y) {
+; CHECK-LABEL: @select_icmp_eq_and_1_0_lshr_tv(
+; CHECK-NEXT:    [[AND:%.*]] = shl i8 [[X:%.*]], 1
+; CHECK-NEXT:    [[TMP1:%.*]] = and i8 [[AND]], 2
+; CHECK-NEXT:    [[SELECT:%.*]] = lshr i8 [[Y:%.*]], [[TMP1]]
+; CHECK-NEXT:    ret i8 [[SELECT]]
+;
+  %and = and i8 %x, 1
+  %cmp = icmp ne i8 %and, 0
+  %blshr = lshr i8 %y, 2
+  %select = select i1 %cmp, i8 %blshr, i8 %y
+  ret i8 %select
+}

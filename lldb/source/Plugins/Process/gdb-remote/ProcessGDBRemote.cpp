@@ -129,8 +129,8 @@ enum {
 
 class PluginProperties : public Properties {
 public:
-  static ConstString GetSettingName() {
-    return ConstString(ProcessGDBRemote::GetPluginNameStatic());
+  static llvm::StringRef GetSettingName() {
+    return ProcessGDBRemote::GetPluginNameStatic();
   }
 
   PluginProperties() : Properties() {
@@ -2089,7 +2089,7 @@ StateType ProcessGDBRemote::SetThreadStopInfo(StringExtractor &stop_packet) {
   switch (stop_type) {
   case 'T':
   case 'S': {
-    // This is a bit of a hack, but is is required. If we did exec, we need to
+    // This is a bit of a hack, but it is required. If we did exec, we need to
     // clear our thread lists and also know to rebuild our dynamic register
     // info before we lookup and threads and populate the expedited register
     // values so we need to know this right away so we can cleanup and update
@@ -3379,23 +3379,20 @@ void ProcessGDBRemote::MonitorDebugserverProcess(
 
   if (state != eStateInvalid && state != eStateUnloaded &&
       state != eStateExited && state != eStateDetached) {
-    char error_str[1024];
-    if (signo) {
-      const char *signal_cstr =
-          process_sp->GetUnixSignals()->GetSignalAsCString(signo);
-      if (signal_cstr)
-        ::snprintf(error_str, sizeof(error_str),
-                   DEBUGSERVER_BASENAME " died with signal %s", signal_cstr);
+    StreamString stream;
+    if (signo == 0)
+      stream.Format(DEBUGSERVER_BASENAME " died with an exit status of {0:x8}",
+                    exit_status);
+    else {
+      llvm::StringRef signal_name =
+          process_sp->GetUnixSignals()->GetSignalAsStringRef(signo);
+      const char *format_str = DEBUGSERVER_BASENAME " died with signal {0}";
+      if (!signal_name.empty())
+        stream.Format(format_str, signal_name);
       else
-        ::snprintf(error_str, sizeof(error_str),
-                   DEBUGSERVER_BASENAME " died with signal %i", signo);
-    } else {
-      ::snprintf(error_str, sizeof(error_str),
-                 DEBUGSERVER_BASENAME " died with an exit status of 0x%8.8x",
-                 exit_status);
+        stream.Format(format_str, signo);
     }
-
-    process_sp->SetExitStatus(-1, error_str);
+    process_sp->SetExitStatus(-1, stream.GetString());
   }
   // Debugserver has exited we need to let our ProcessGDBRemote know that it no
   // longer has a debugserver instance

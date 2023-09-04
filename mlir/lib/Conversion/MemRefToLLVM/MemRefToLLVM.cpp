@@ -826,7 +826,7 @@ struct RankOpLowering : public ConvertOpToLLVMPattern<memref::RankOp> {
                   ConversionPatternRewriter &rewriter) const override {
     Location loc = op.getLoc();
     Type operandType = op.getMemref().getType();
-    if (auto unrankedMemRefType = dyn_cast<UnrankedMemRefType>(operandType)) {
+    if (dyn_cast<UnrankedMemRefType>(operandType)) {
       UnrankedMemRefDescriptor desc(adaptor.getMemref());
       rewriter.replaceOp(op, {desc.rank(rewriter, loc)});
       return success();
@@ -1753,10 +1753,14 @@ matchSimpleAtomicOp(memref::AtomicRMWOp atomicOp) {
     return LLVM::AtomicBinOp::add;
   case arith::AtomicRMWKind::assign:
     return LLVM::AtomicBinOp::xchg;
+  case arith::AtomicRMWKind::maxf:
+    return LLVM::AtomicBinOp::fmax;
   case arith::AtomicRMWKind::maxs:
     return LLVM::AtomicBinOp::max;
   case arith::AtomicRMWKind::maxu:
     return LLVM::AtomicBinOp::umax;
+  case arith::AtomicRMWKind::minf:
+    return LLVM::AtomicBinOp::fmin;
   case arith::AtomicRMWKind::mins:
     return LLVM::AtomicBinOp::min;
   case arith::AtomicRMWKind::minu:

@@ -218,10 +218,8 @@ bool ValueObject::UpdateFormatsIfNeeded() {
     SetValueFormat(DataVisualization::GetFormat(*this, eNoDynamicValues));
     SetSummaryFormat(
         DataVisualization::GetSummaryFormat(*this, GetDynamicValueType()));
-#if LLDB_ENABLE_PYTHON
     SetSyntheticChildren(
         DataVisualization::GetSyntheticChildren(*this, GetDynamicValueType()));
-#endif
   }
 
   return any_change;
@@ -1153,7 +1151,7 @@ bool ValueObject::DumpPrintableRepresentation(
     Stream &s, ValueObjectRepresentationStyle val_obj_display,
     Format custom_format, PrintableRepresentationSpecialCases special,
     bool do_dump_error) {
-    
+
   // If the ValueObject has an error, we might end up dumping the type, which
   // is useful, but if we don't even have a type, then don't examine the object
   // further as that's not meaningful, only the error is.
@@ -2131,11 +2129,10 @@ ValueObjectSP ValueObject::GetValueForExpressionPath_Impl(
       temp_expression = temp_expression.drop_front(); // skip . or >
 
       size_t next_sep_pos = temp_expression.find_first_of("-.[", 1);
-      ConstString child_name;
       if (next_sep_pos == llvm::StringRef::npos) // if no other separator just
                                                  // expand this last layer
       {
-        child_name.SetString(temp_expression);
+        llvm::StringRef child_name = temp_expression;
         ValueObjectSP child_valobj_sp =
             root->GetChildMemberWithName(child_name);
 
@@ -2203,8 +2200,7 @@ ValueObjectSP ValueObject::GetValueForExpressionPath_Impl(
       } else // other layers do expand
       {
         llvm::StringRef next_separator = temp_expression.substr(next_sep_pos);
-
-        child_name.SetString(temp_expression.slice(0, next_sep_pos));
+        llvm::StringRef child_name = temp_expression.slice(0, next_sep_pos);
 
         ValueObjectSP child_valobj_sp =
             root->GetChildMemberWithName(child_name);
@@ -2768,15 +2764,15 @@ ValueObjectSP ValueObject::DoCast(const CompilerType &compiler_type) {
 
 ValueObjectSP ValueObject::Cast(const CompilerType &compiler_type) {
   // Only allow casts if the original type is equal or larger than the cast
-  // type.  We don't know how to fetch more data for all the ConstResult types, 
+  // type.  We don't know how to fetch more data for all the ConstResult types,
   // so we can't guarantee this will work:
   Status error;
   CompilerType my_type = GetCompilerType();
 
-  ExecutionContextScope *exe_scope 
+  ExecutionContextScope *exe_scope
       = ExecutionContext(GetExecutionContextRef())
           .GetBestExecutionContextScope();
-  if (compiler_type.GetByteSize(exe_scope) 
+  if (compiler_type.GetByteSize(exe_scope)
       <= GetCompilerType().GetByteSize(exe_scope)) {
         return DoCast(compiler_type);
   }

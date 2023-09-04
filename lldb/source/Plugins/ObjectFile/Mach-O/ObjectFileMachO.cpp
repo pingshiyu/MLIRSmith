@@ -1202,6 +1202,7 @@ AddressClass ObjectFileMachO::GetAddressClass(lldb::addr_t file_addr) {
         case eSectionTypeDWARFAppleObjC:
         case eSectionTypeDWARFGNUDebugAltLink:
         case eSectionTypeCTF:
+        case eSectionTypeSwiftModules:
           return AddressClass::eDebug;
 
         case eSectionTypeEHFrame:
@@ -1476,6 +1477,7 @@ static lldb::SectionType GetSectionType(uint32_t flags,
   static ConstString g_sect_name_data("__data");
   static ConstString g_sect_name_go_symtab("__gosymtab");
   static ConstString g_sect_name_ctf("__ctf");
+  static ConstString g_sect_name_swift_ast("__swift_ast");
 
   if (section_name == g_sect_name_dwarf_debug_abbrev)
     return eSectionTypeDWARFDebugAbbrev;
@@ -1555,6 +1557,8 @@ static lldb::SectionType GetSectionType(uint32_t flags,
     return eSectionTypeGoSymtab;
   if (section_name == g_sect_name_ctf)
     return eSectionTypeCTF;
+  if (section_name == g_sect_name_swift_ast)
+    return eSectionTypeSwiftModules;
   if (section_name == g_sect_name_objc_data ||
       section_name == g_sect_name_objc_classrefs ||
       section_name == g_sect_name_objc_superrefs ||
@@ -5514,9 +5518,7 @@ AddressableBits ObjectFileMachO::GetAddressableBits() {
           if (m_data.GetU32(&offset, &version, 1) != nullptr) {
             if (version == 3) {
               uint32_t num_addr_bits = m_data.GetU32_unchecked(&offset);
-              if (num_addr_bits != 0) {
-                addressable_bits.SetAddressableBits(num_addr_bits);
-              }
+              addressable_bits.SetAddressableBits(num_addr_bits);
               LLDB_LOGF(log,
                         "LC_NOTE 'addrable bits' v3 found, value %d "
                         "bits",
@@ -5527,7 +5529,10 @@ AddressableBits ObjectFileMachO::GetAddressableBits() {
               uint32_t lo_addr_bits = m_data.GetU32_unchecked(&offset);
               uint32_t hi_addr_bits = m_data.GetU32_unchecked(&offset);
 
-              addressable_bits.SetAddressableBits(lo_addr_bits, hi_addr_bits);
+              if (lo_addr_bits == hi_addr_bits)
+                addressable_bits.SetAddressableBits(lo_addr_bits);
+              else
+                addressable_bits.SetAddressableBits(lo_addr_bits, hi_addr_bits);
               LLDB_LOGF(log,
                         "LC_NOTE 'addrable bits' v4 found, value %d & %d bits",
                         lo_addr_bits, hi_addr_bits);

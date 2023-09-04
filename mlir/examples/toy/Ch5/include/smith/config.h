@@ -11,6 +11,8 @@
 #include <iostream>
 using json = nlohmann::json;
 
+inline bool is_default = false;
+
 const int priority_base = 100;
 const int integer_set_num = 16;
 const int integer_set_exprs_ub = 4;
@@ -453,7 +455,7 @@ inline Conf getConfigTemplate() {
   return c;
 }
 
-inline void initConfig(std::string fileName = "config.json") {
+inline void initConfig(std::string fileName) {
   //   for experiment use.
   //    std::cout << fileName + " is current config file.\n";
   //    std::ifstream f(fileName);

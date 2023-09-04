@@ -46,7 +46,7 @@ OpGenerator linalgGenericGenerator() {
 
   return [](OpBuilder &builder, Location loc, OpRegion &parent) {
     auto typedValuePool = parent.pool;
-    int input_num = UR(linalg_operands_num_ub)+1;
+    int input_num = UR(linalg_operands_num_ub) + 1;
 
     auto elemTy = randomIntOrFloatType(builder.getContext());
 
@@ -79,8 +79,8 @@ OpGenerator linalgGenericGenerator() {
     SmallVector<AffineExpr> affineExprs0;
     SmallVector<int64_t> shape0;
     for (int j = 0; j < outputRank; ++j) {
-        affineExprs0.push_back(builder.getAffineDimExpr(j));
-        shape0.push_back(dimMap[j]);
+      affineExprs0.push_back(builder.getAffineDimExpr(j));
+      shape0.push_back(dimMap[j]);
     }
     indexingMaps.push_back(AffineMap::get(/*dimCount=*/outputRank,
                                           /*symbolCount=*/0, affineExprs0,

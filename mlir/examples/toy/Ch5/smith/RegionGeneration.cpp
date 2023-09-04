@@ -69,9 +69,9 @@ std::vector<Operation *> RegionGen::apply(OpBuilder &builder, Location loc,
     if (!opGen) {
       continue;
     }
-//    std::cout << "before " + opGen->opName << std::endl;
+    std::cout << "before " + opGen->opName << std::endl;
     auto operation = opGen->apply(builder, loc, *region);
-//    std::cout << "after " + opGen->opName << std::endl;
+    std::cout << "after " + opGen->opName << std::endl;
     if (operation) {
       operations.push_back(operation);
       auto current_op = operation->getName().getStringRef().str();

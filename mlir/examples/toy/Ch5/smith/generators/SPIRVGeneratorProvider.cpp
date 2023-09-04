@@ -6,21 +6,128 @@
 #include "include/smith/TypeGeneration.h"
 #include "include/smith/generators/OpGeneration.h"
 
-// Note： T should be either Integer or Float type.
-template <typename T>
-bool isValidUnaryOperand(TypeValue t, std::vector<uint64_t> validWidths,
-                         std::vector<uint64_t> validDims) {
-  auto intTy = t.type.dyn_cast<T>();
-  auto vecTy = t.type.dyn_cast<VectorType>();
-  return (intTy && std::find(validWidths.begin(), validWidths.end(),
-                             intTy.getWidth()) != validWidths.end()) ||
-         (vecTy && vecTy.getElementType().dyn_cast<T>() &&
-          std::find(validWidths.begin(), validWidths.end(),
-                    vecTy.getElementType().getIntOrFloatBitWidth()) !=
-              validWidths.end() &&
-          vecTy.getRank() == 1 &&
-          std::find(validDims.begin(), validDims.end(), vecTy.getDimSize(0)) !=
-              validDims.end());
+void registerSPIRVGenerators() {
+  std::vector<OpGen> spirvGens = {spirvBitCountGenerator(),
+                                  spirvBitReverseGenerator(),
+                                  spirvFNegateGenerator(),
+                                  spirvIsInfGenerator(),
+                                  spirvIsNanGenerator(),
+                                  spirvLogicalNotGenerator(),
+                                  spirvNotGenerator(),
+                                  spirvBitFieldInsertGenerator(),
+                                  spirvBitFieldSExtractGenerator(),
+                                  spirvBitFieldUExtractGenerator(),
+                                  spirvBitwiseAndGenerator(),
+                                  spirvBitwiseOrGenerator(),
+                                  spirvBitwiseXorGenerator(),
+                                  spirvCLCeilGenerator(),
+                                  spirvCLCosGenerator(),
+                                  spirvCLErfGenerator(),
+                                  spirvCLExpGenerator(),
+                                  spirvCLFAbsGenerator(),
+                                  spirvCLFloorGenerator(),
+                                  spirvCLLogGenerator(),
+                                  spirvCLRintGenerator(),
+                                  spirvCLRoundGenerator(),
+                                  spirvCLRsqrtGenerator(),
+                                  spirvCLSinGenerator(),
+                                  spirvCLSqrtGenerator(),
+                                  spirvCLTanhGenerator(),
+                                  spirvBitwiseOrGenerator(),
+                                  spirvBitwiseXorGenerator(),
+                                  spirvCLCeilGenerator(),
+                                  spirvCLCosGenerator(),
+                                  spirvCLErfGenerator(),
+                                  spirvCLExpGenerator(),
+                                  spirvCLFAbsGenerator(),
+                                  spirvCLFloorGenerator(),
+                                  spirvCLLogGenerator(),
+                                  spirvCLRintGenerator(),
+                                  spirvCLRoundGenerator(),
+                                  spirvCLRsqrtGenerator(),
+                                  spirvCLSinGenerator(),
+                                  spirvCLSqrtGenerator(),
+                                  spirvCLTanhGenerator(),
+                                  spirvFOrdEqualGenerator(),
+                                  spirvFOrdGreaterThanEqualGenerator(),
+                                  spirvFOrdGreaterThanGenerator(),
+                                  spirvFOrdLessThanEqualGenerator(),
+                                  spirvFOrdLessThanGenerator(),
+                                  spirvFOrdNotEqualGenerator(),
+                                  spirvFUnordEqualGenerator(),
+                                  spirvFUnordGreaterThanEqualGenerator(),
+                                  spirvFUnordGreaterThanGenerator(),
+                                  spirvFUnordLessThanEqualGenerator(),
+                                  spirvFUnordLessThanGenerator(),
+                                  spirvFUnordNotEqualGenerator(),
+                                  spirvIEqualGenerator(),
+                                  spirvINotEqualGenerator(),
+                                  spirvLogicalAndGenerator(),
+                                  spirvLogicalOrGenerator(),
+                                  spirvLogicalEqualGenerator(),
+                                  spirvLogicalNotEqualGenerator(),
+                                  spirvSGreaterThanEqualGenerator(),
+                                  spirvSGreaterThanGenerator(),
+                                  spirvSLessThanEqualGenerator(),
+                                  spirvSLessThanGenerator(),
+                                  spirvUGreaterThanEqualGenerator(),
+                                  spirvUGreaterThanGenerator(),
+                                  spirvULessThanEqualGenerator(),
+                                  spirvULessThanGenerator(),
+                                  spirvUnorderedGenerator(),
+                                  spirvGLAcosGenerator(),
+                                  spirvGLAsinGenerator(),
+                                  spirvGLAtanGenerator(),
+                                  spirvGLCeilGenerator(),
+                                  spirvGLCosGenerator(),
+                                  spirvGLCoshGenerator(),
+                                  spirvGLExpGenerator(),
+                                  spirvGLFAbsGenerator(),
+                                  spirvGLFSignGenerator(),
+                                  spirvGLFloorGenerator(),
+                                  spirvGLInverseSqrtGenerator(),
+                                  spirvGLLogGenerator(),
+                                  spirvGLRoundEvenGenerator(),
+                                  spirvGLRoundGenerator(),
+                                  spirvGLSinGenerator(),
+                                  spirvGLSinhGenerator(),
+                                  spirvGLSqrtGenerator(),
+                                  spirvGLTanGenerator(),
+                                  spirvGLTanhGenerator(),
+                                  spirvGLFClampGenerator(),
+                                  spirvGLFMaxGenerator(),
+                                  spirvGLFMinGenerator(),
+                                  spirvGLFMixGenerator(),
+//                                  spirvGLFindUMsbGenerator(), //TODO
+                                  spirvGLFmaGenerator(),
+                                  spirvGLLdexpGenerator(),
+                                  spirvGLPowGenerator(),
+                                  spirvGLSAbsGenerator(),
+                                  spirvGLSClampGenerator(),
+                                  spirvGLSMaxGenerator(),
+                                  spirvGLSMinGenerator(),
+                                  spirvGLSSignGenerator(),
+                                  spirvGLUClampGenerator(),
+                                  spirvGLUMaxGenerator(),
+                                  spirvGLUMinGenerator(),
+                                  spirvCLFMaxGenerator(),
+                                  spirvCLFMinGenerator(),
+                                  spirvCLFmaGenerator(),
+                                  spirvCLPowGenerator(),
+                                  spirvCLSAbsGenerator(),
+                                  spirvCLSMaxGenerator(),
+                                  spirvCLSMinGenerator(),
+                                  spirvCLUMaxGenerator(),
+                                  spirvCLUMinGenerator()};
+
+  for (auto gen : spirvGens) {
+    operators.insert(std::make_pair(gen.opName, gen));
+    opsForFunc.insert(gen.opName);
+    auto pos = gen.opName.find(".");
+    auto dialect = gen.opName.substr(0, pos);
+    auto id = gen.opName.substr(pos+1, gen.opName.size());
+    conf.supported_ops.push_back(OpConf(dialect, id, UR(priority_base), {}));
+  }
 }
 
 bool isBoolOrBoolVector(TypeValue t, std::vector<uint64_t> validDims) {
@@ -53,9 +160,26 @@ bool isFloatOrFloatVector(TypeValue t, std::vector<uint64_t> validWidths,
               validDims.end());
 }
 
+// Note： T should be either Integer or Float type.
 template <typename T>
-OpGenerator getSPIRVIntUnaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+bool isValidUnaryOperand(TypeValue t, std::vector<uint64_t> validWidths,
+                         std::vector<uint64_t> validDims) {
+  auto intTy = t.type.dyn_cast<T>();
+  auto vecTy = t.type.dyn_cast<VectorType>();
+  return (intTy && std::find(validWidths.begin(), validWidths.end(),
+                             intTy.getWidth()) != validWidths.end()) ||
+         (vecTy && vecTy.getElementType().dyn_cast<T>() &&
+          std::find(validWidths.begin(), validWidths.end(),
+                    vecTy.getElementType().getIntOrFloatBitWidth()) !=
+              validWidths.end() &&
+          vecTy.getRank() == 1 &&
+          std::find(validDims.begin(), validDims.end(), vecTy.getDimSize(0)) !=
+              validDims.end());
+}
+
+template <typename T>
+OpGen getSPIRVIntUnaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<IntegerType>(t, {8, 16, 32, 64},
@@ -71,11 +195,12 @@ OpGenerator getSPIRVIntUnaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
 template <typename T>
-OpGenerator getSPIRVFloatUnaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+OpGen getSPIRVFloatUnaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<FloatType>(t, {8, 16, 32, 64},
@@ -91,11 +216,12 @@ OpGenerator getSPIRVFloatUnaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
 template <typename T>
-OpGenerator getSPIRVFloat16Or32UnaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+OpGen getSPIRVFloat16Or32UnaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<FloatType>(t, {16, 32}, {2, 3, 4, 8, 16});
@@ -110,11 +236,12 @@ OpGenerator getSPIRVFloat16Or32UnaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
 template <typename T>
-OpGenerator getSPIRVIntBinaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+OpGen getSPIRVIntBinaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<IntegerType>(t, {8, 16, 32, 64},
@@ -135,11 +262,12 @@ OpGenerator getSPIRVIntBinaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
 template <typename T>
-OpGenerator getSPIRVIntLogicalBinaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+OpGen getSPIRVIntLogicalBinaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<IntegerType>(t, {8, 16, 32, 64},
@@ -166,10 +294,12 @@ OpGenerator getSPIRVIntLogicalBinaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
+
 template <typename T>
-OpGenerator getSPIRVFloatBinaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+OpGen getSPIRVFloatBinaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<FloatType>(t, {8, 16, 32, 64},
@@ -190,11 +320,43 @@ OpGenerator getSPIRVFloatBinaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
 template <typename T>
-OpGenerator getSPIRVBoolUnaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+OpGen getSPIRVBitBinaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
+    auto vecCandidates =
+        region.pool.searchCandidatesFrom({PoolType::Vector}, [](TypeValue t) {
+          if (t.val.getType().dyn_cast<VectorType>().getElementType().isInteger(
+                  1)) {
+            return false;
+          }
+          return isIntOrIntVector(t, {8, 16, 32, 64}, {2, 3, 4, 8, 16});
+        });
+    if (vecCandidates.empty()) {
+      vecCandidates.push_back(region.pool.generateVector(
+          builder, loc, VectorType::get({2}, builder.getI32Type())));
+    }
+    auto operand1 = sampleTypedValueFrom(vecCandidates, opName);
+
+    auto operand2Candidates =
+        region.pool.searchCandidatesFrom({PoolType::Vector}, [&](TypeValue t) {
+          return t.type == operand1.val.getType();
+        });
+    auto operand2 = sampleTypedValueFrom(operand2Candidates, opName);
+
+    auto op = builder.create<T>(loc, operand1.val, operand2.val);
+    auto tval = TypeValue(op.getType(), op);
+    region.pool.addTypeValue(tval, opName);
+    return op.getOperation();
+  };
+  return OpGen(opName, gen);
+}
+
+template <typename T>
+OpGen getSPIRVBoolUnaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isBoolOrBoolVector(t, {2, 3, 4, 8, 16});
@@ -209,11 +371,12 @@ OpGenerator getSPIRVBoolUnaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
 template <typename T>
-OpGenerator getSPIRVFUnaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+OpGen getSPIRVFUnaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::IntOrFloat, PoolType::Vector}, [](TypeValue t) {
           return isFloatOrFloatVector(t, {16, 32, 64}, {2, 3, 4, 8, 16});
@@ -228,11 +391,12 @@ OpGenerator getSPIRVFUnaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
 template <typename T>
-OpGenerator getSPIRVIUnaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+OpGen getSPIRVIUnaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::IntOrFloat, PoolType::Vector}, [](TypeValue t) {
           return isIntOrIntVector(t, {8, 16, 32, 64}, {2, 3, 4, 8, 16});
@@ -247,15 +411,135 @@ OpGenerator getSPIRVIUnaryOpGenerator(std::string opName) {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
-OpGenerator spirvBitCountGenerator() {
+template <typename T>
+OpGen spirvBitFieldExtractGenerator(std::string uOrS) {
+  auto opName = "spirv.BitField" + uOrS + "Extract";
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
+    auto vecCandidates =
+        region.pool.searchCandidatesFrom({PoolType::Vector}, [](TypeValue t) {
+          if (t.val.getType().dyn_cast<VectorType>().getElementType().isInteger(
+                  1)) {
+            return false;
+          }
+          return isIntOrIntVector(t, {8, 16, 32, 64}, {2, 3, 4, 8, 16});
+        });
+    if (vecCandidates.empty()) {
+      vecCandidates.push_back(region.pool.generateVector(
+          builder, loc, VectorType::get({2}, builder.getI32Type())));
+    }
+    auto operand1 = sampleTypedValueFrom(vecCandidates, opName);
+
+    auto intCandidates = region.pool.searchCandidatesFrom(
+        {PoolType::IntOrFloat}, [](TypeValue t) {
+          auto ty = t.val.getType().dyn_cast<IntegerType>();
+          return ty && (ty.getWidth() == 8 || ty.getWidth() == 16 ||
+                        ty.getWidth() == 32 || ty.getWidth() == 64);
+        });
+    if (intCandidates.empty()) {
+      intCandidates.push_back(
+          region.pool.generateInteger(builder, loc, builder.getI32Type()));
+    }
+    auto operand3 = sampleTypedValueFrom(intCandidates, opName);
+    auto operand4 = sampleTypedValueFrom(intCandidates, opName);
+
+    auto op = builder.create<T>(loc, operand1.val, operand3.val, operand4.val);
+    auto tval = TypeValue(op.getType(), op);
+    region.pool.addTypeValue(tval, opName);
+    return op.getOperation();
+  };
+  return OpGen(opName, gen);
+}
+
+template <typename T>
+OpGen getSPIRVFloatTriOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
+    auto candidates = region.pool.searchCandidatesFrom(
+        {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
+          return isValidUnaryOperand<FloatType>(t, {16, 32, 64},
+                                                {2, 3, 4, 8, 16});
+        });
+    if (candidates.empty()) {
+      candidates.push_back(
+          region.pool.generateFloat(builder, loc, builder.getF32Type()));
+    }
+    auto operand = sampleTypedValueFrom(candidates, opName);
+
+    auto operand2Candidates = region.pool.searchCandidatesFrom(
+        {PoolType::Vector, PoolType::IntOrFloat},
+        [&](TypeValue t) { return t.type == operand.val.getType(); });
+    auto op =
+        builder.create<T>(loc, operand.val.getType(), operand.val,
+                          sampleTypedValueFrom(operand2Candidates, opName).val,
+                          sampleTypedValueFrom(operand2Candidates, opName).val);
+    auto tval = TypeValue(op.getType(), op);
+    region.pool.addTypeValue(tval, opName);
+    return op.getOperation();
+  };
+  return OpGen(opName, gen);
+}
+
+template <typename T>
+OpGen getSPIRVIntTriOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
+    auto candidates = region.pool.searchCandidatesFrom(
+        {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
+          return isValidUnaryOperand<IntegerType>(t, {8, 16, 32, 64},
+                                                  {2, 3, 4, 8, 16});
+        });
+    if (candidates.empty()) {
+      candidates.push_back(
+          region.pool.generateFloat(builder, loc, builder.getF32Type()));
+    }
+    auto operand = sampleTypedValueFrom(candidates, opName);
+
+    auto operand2Candidates = region.pool.searchCandidatesFrom(
+        {PoolType::Vector, PoolType::IntOrFloat},
+        [&](TypeValue t) { return t.type == operand.val.getType(); });
+    auto op =
+        builder.create<T>(loc, operand.val.getType(), operand.val,
+                          sampleTypedValueFrom(operand2Candidates, opName).val,
+                          sampleTypedValueFrom(operand2Candidates, opName).val);
+    auto tval = TypeValue(op.getType(), op);
+    region.pool.addTypeValue(tval, opName);
+    return op.getOperation();
+  };
+  return OpGen(opName, gen);
+}
+
+template <typename T>
+OpGen getSPIRVBoolBinaryOpGenerator(std::string opName) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
+    auto candidates = region.pool.searchCandidatesFrom(
+        {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
+          return isValidUnaryOperand<IntegerType>(t, {1}, {2, 3, 4, 8, 16});
+        });
+    if (candidates.empty()) {
+      candidates.push_back(
+          region.pool.generateInteger(builder, loc, builder.getI1Type()));
+    }
+    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand2Candidates = region.pool.searchCandidatesFrom(
+        {PoolType::Vector, PoolType::IntOrFloat},
+        [&](TypeValue t) { return t.type == operand.val.getType(); });
+    auto op = builder.create<T>(
+        loc, operand.val, sampleTypedValueFrom(operand2Candidates, opName).val);
+    auto tval = TypeValue(op.getType(), op);
+    region.pool.addTypeValue(tval, opName);
+    return op.getOperation();
+  };
+  return OpGen(opName, gen);
+}
+
+OpGen spirvBitCountGenerator() {
   return getSPIRVIntUnaryOpGenerator<spirv::BitCountOp>("spirv.BitCount");
 }
 
-OpGenerator spirvBitFieldInsertGenerator() {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
-    auto opName = "spirv.BitFieldInsert";
+OpGen spirvBitFieldInsertGenerator() {
+  auto opName = "spirv.BitFieldInsert";
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto vecCandidates =
         region.pool.searchCandidatesFrom({PoolType::Vector}, [](TypeValue t) {
           if (t.val.getType().dyn_cast<VectorType>().getElementType().isInteger(
@@ -294,564 +578,427 @@ OpGenerator spirvBitFieldInsertGenerator() {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
-template <typename T>
-OpGenerator spirvBitFieldExtractGenerator(std::string uOrS) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
-    auto opName = "spirv.BitField" + uOrS + "Extract";
-    auto vecCandidates =
-        region.pool.searchCandidatesFrom({PoolType::Vector}, [](TypeValue t) {
-          if (t.val.getType().dyn_cast<VectorType>().getElementType().isInteger(
-                  1)) {
-            return false;
-          }
-          return isIntOrIntVector(t, {8, 16, 32, 64}, {2, 3, 4, 8, 16});
-        });
-    if (vecCandidates.empty()) {
-      vecCandidates.push_back(region.pool.generateVector(
-          builder, loc, VectorType::get({2}, builder.getI32Type())));
-    }
-    auto operand1 = sampleTypedValueFrom(vecCandidates, opName);
-
-    auto intCandidates = region.pool.searchCandidatesFrom(
-        {PoolType::IntOrFloat}, [](TypeValue t) {
-          auto ty = t.val.getType().dyn_cast<IntegerType>();
-          return ty && (ty.getWidth() == 8 || ty.getWidth() == 16 ||
-                        ty.getWidth() == 32 || ty.getWidth() == 64);
-        });
-    if (intCandidates.empty()) {
-      intCandidates.push_back(
-          region.pool.generateInteger(builder, loc, builder.getI32Type()));
-    }
-    auto operand3 = sampleTypedValueFrom(intCandidates, opName);
-    auto operand4 = sampleTypedValueFrom(intCandidates, opName);
-
-    auto op = builder.create<T>(loc, operand1.val, operand3.val, operand4.val);
-    auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
-    return op.getOperation();
-  };
-}
-
-OpGenerator spirvBitFieldSExtractGenerator() {
+OpGen spirvBitFieldSExtractGenerator() {
   return spirvBitFieldExtractGenerator<spirv::BitFieldSExtractOp>("S");
 }
 
-OpGenerator spirvBitFieldUExtractGenerator() {
+OpGen spirvBitFieldUExtractGenerator() {
   return spirvBitFieldExtractGenerator<spirv::BitFieldUExtractOp>("U");
 }
 
-OpGenerator spirvBitReverseGenerator() {
+OpGen spirvBitReverseGenerator() {
   return getSPIRVIntUnaryOpGenerator<spirv::BitReverseOp>("spirv.BitReverse");
 }
 
-OpGenerator spirvNotGenerator() {
+OpGen spirvNotGenerator() {
   return getSPIRVIntUnaryOpGenerator<spirv::NotOp>("spirv.Not");
 }
-
-template <typename T>
-OpGenerator getSPIRVBitBinaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
-    auto vecCandidates =
-        region.pool.searchCandidatesFrom({PoolType::Vector}, [](TypeValue t) {
-          if (t.val.getType().dyn_cast<VectorType>().getElementType().isInteger(
-                  1)) {
-            return false;
-          }
-          return isIntOrIntVector(t, {8, 16, 32, 64}, {2, 3, 4, 8, 16});
-        });
-    if (vecCandidates.empty()) {
-      vecCandidates.push_back(region.pool.generateVector(
-          builder, loc, VectorType::get({2}, builder.getI32Type())));
-    }
-    auto operand1 = sampleTypedValueFrom(vecCandidates, opName);
-
-    auto operand2Candidates =
-        region.pool.searchCandidatesFrom({PoolType::Vector}, [&](TypeValue t) {
-          return t.type == operand1.val.getType();
-        });
-    auto operand2 = sampleTypedValueFrom(operand2Candidates, opName);
-
-    auto op = builder.create<T>(loc, operand1.val, operand2.val);
-    auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
-    return op.getOperation();
-  };
-}
-
-OpGenerator spirvBitwiseAndGenerator() {
+OpGen spirvBitwiseAndGenerator() {
   return getSPIRVBitBinaryOpGenerator<spirv::BitwiseAndOp>("spirv.BitwiseAnd");
 }
 
-OpGenerator spirvBitwiseOrGenerator() {
+OpGen spirvBitwiseOrGenerator() {
   return getSPIRVBitBinaryOpGenerator<spirv::BitwiseOrOp>("spirv.BitwiseOr");
 }
 
-OpGenerator spirvBitwiseXorGenerator() {
+OpGen spirvBitwiseXorGenerator() {
   return getSPIRVBitBinaryOpGenerator<spirv::BitwiseXorOp>("spirv.BitwiseXor");
 }
 
-OpGenerator spirvCLCeilGenerator() {
+OpGen spirvCLCeilGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLCeilOp>("spirv.CL.ceil");
 }
 
-OpGenerator spirvCLCosGenerator() {
+OpGen spirvCLCosGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLCosOp>("spirv.CL.cos");
 }
 
-OpGenerator spirvCLErfGenerator() {
+OpGen spirvCLErfGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLErfOp>("spirv.CL.erf");
 }
 
-OpGenerator spirvCLExpGenerator() {
+OpGen spirvCLExpGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLExpOp>("spirv.CL.exp");
 }
 
-OpGenerator spirvCLFAbsGenerator() {
+OpGen spirvCLFAbsGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLFAbsOp>("spirv.CL.fabs");
 }
 
-OpGenerator spirvCLFloorGenerator() {
+OpGen spirvCLFloorGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLFloorOp>("spirv.CL.floor");
 }
 
-OpGenerator spirvCLLogGenerator() {
+OpGen spirvCLLogGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLLogOp>("spirv.CL.log");
 }
 
-OpGenerator spirvCLRoundGenerator() {
+OpGen spirvCLRoundGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLRoundOp>("spirv.CL.round");
 }
 
-OpGenerator spirvCLRintGenerator() {
+OpGen spirvCLRintGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLRintOp>("spirv.CL.rint");
 }
 
-OpGenerator spirvCLRsqrtGenerator() {
+OpGen spirvCLRsqrtGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLRsqrtOp>("spirv.CL.rsqrt");
 }
 
-OpGenerator spirvCLSinGenerator() {
+OpGen spirvCLSinGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLSinOp>("spirv.CL.sin");
 }
 
-OpGenerator spirvCLSqrtGenerator() {
+OpGen spirvCLSqrtGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLSqrtOp>("spirv.CL.sqrt");
 }
 
-OpGenerator spirvCLTanhGenerator() {
+OpGen spirvCLTanhGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::CLTanhOp>("spirv.CL.tanh");
 }
 
-OpGenerator spirvCLSAbsGenerator() {
+OpGen spirvCLSAbsGenerator() {
   return getSPIRVIntUnaryOpGenerator<spirv::CLSAbsOp>("spirv.CL.sabs");
 }
 
-OpGenerator spirvCLFMaxGenerator() {
+OpGen spirvCLFMaxGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::CLFMaxOp>("spirv.CL.fmax");
 }
 
-OpGenerator spirvCLFMinGenerator() {
+OpGen spirvCLFMinGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::CLFMinOp>("spirv.CL.fmin");
 }
-OpGenerator spirvCLPowGenerator() {
+OpGen spirvCLPowGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::CLPowOp>("spirv.CL.pow");
 }
 
-OpGenerator spirvCLSMaxGenerator() {
+OpGen spirvCLSMaxGenerator() {
   return getSPIRVIntBinaryOpGenerator<spirv::CLSMaxOp>("spirv.CL.smax");
 }
 
-OpGenerator spirvCLSMinGenerator() {
+OpGen spirvCLSMinGenerator() {
   return getSPIRVIntBinaryOpGenerator<spirv::CLSMinOp>("spirv.CL.smin");
 }
 
-OpGenerator spirvCLUMaxGenerator() {
+OpGen spirvCLUMaxGenerator() {
   return getSPIRVIntBinaryOpGenerator<spirv::CLUMaxOp>("spirv.CL.umax");
 }
 
-OpGenerator spirvCLUMinGenerator() {
+OpGen spirvCLUMinGenerator() {
   return getSPIRVIntBinaryOpGenerator<spirv::CLUMinOp>("spirv.CL.umin");
 }
 
-template <typename T>
-OpGenerator getSPIRVFloatTriOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
-    auto candidates = region.pool.searchCandidatesFrom(
-        {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
-          return isValidUnaryOperand<FloatType>(t, {16, 32, 64},
-                                                {2, 3, 4, 8, 16});
-        });
-    if (candidates.empty()) {
-      candidates.push_back(
-          region.pool.generateFloat(builder, loc, builder.getF32Type()));
-    }
-    auto operand = sampleTypedValueFrom(candidates, opName);
-
-    auto operand2Candidates = region.pool.searchCandidatesFrom(
-        {PoolType::Vector, PoolType::IntOrFloat},
-        [&](TypeValue t) { return t.type == operand.val.getType(); });
-    auto op =
-        builder.create<T>(loc, operand.val.getType(), operand.val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val);
-    auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
-    return op.getOperation();
-  };
-}
-
-template <typename T>
-OpGenerator getSPIRVIntTriOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
-    auto candidates = region.pool.searchCandidatesFrom(
-        {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
-          return isValidUnaryOperand<IntegerType>(t, {8, 16, 32, 64},
-                                                {2, 3, 4, 8, 16});
-        });
-    if (candidates.empty()) {
-      candidates.push_back(
-          region.pool.generateFloat(builder, loc, builder.getF32Type()));
-    }
-    auto operand = sampleTypedValueFrom(candidates, opName);
-
-    auto operand2Candidates = region.pool.searchCandidatesFrom(
-        {PoolType::Vector, PoolType::IntOrFloat},
-        [&](TypeValue t) { return t.type == operand.val.getType(); });
-    auto op =
-        builder.create<T>(loc, operand.val.getType(), operand.val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val);
-    auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
-    return op.getOperation();
-  };
-}
-
-OpGenerator spirvCLFmaGenerator() {
+OpGen spirvCLFmaGenerator() {
   return getSPIRVFloatTriOpGenerator<spirv::CLFmaOp>("spriv.CL.fma");
 }
-// OpGenerator spirvCLPrintfGenerator(){};
+// OpGen spirvCLPrintfGenerator(){};
 
-// OpGenerator spirvBitcastGenerator(){};
-// OpGenerator spirvBranchConditionalGenerator(){};
-// OpGenerator spirvBranchGenerator(){};
+// OpGen spirvBitcastGenerator(){};
+// OpGen spirvBranchConditionalGenerator(){};
+// OpGen spirvBranchGenerator(){};
 
-// OpGenerator spirvCompositeConstructGenerator(){};
-// OpGenerator spirvCompositeExtractGenerator(){};
-// OpGenerator spirvCompositeInsertGenerator(){};
-// OpGenerator spirvConstantGenerator(){};
-// OpGenerator spirvControlBarrierGenerator(){};
-// OpGenerator spirvConvertFToSGenerator(){};
-// OpGenerator spirvConvertFToUGenerator(){};
-// OpGenerator spirvConvertPtrToUGenerator(){};
-// OpGenerator spirvConvertSToFGenerator(){};
-// OpGenerator spirvConvertUToFGenerator(){};
-// OpGenerator spirvConvertUToPtrGenerator(){};
-// OpGenerator spirvCopyMemoryGenerator(){};
-// OpGenerator spirvEXTAtomicFAddGenerator(){};
-// OpGenerator spirvEntryPointGenerator(){};
-// OpGenerator spirvExecutionModeGenerator(){};
-// OpGenerator spirvFAddGenerator(){};
-// OpGenerator spirvFConvertGenerator(){};
-// OpGenerator spirvFDivGenerator(){};
-// OpGenerator spirvFModGenerator(){};
-// OpGenerator spirvFMulGenerator(){};
+// OpGen spirvCompositeConstructGenerator(){};
+// OpGen spirvCompositeExtractGenerator(){};
+// OpGen spirvCompositeInsertGenerator(){};
+// OpGen spirvConstantGenerator(){};
+// OpGen spirvControlBarrierGenerator(){};
+// OpGen spirvConvertFToSGenerator(){};
+// OpGen spirvConvertFToUGenerator(){};
+// OpGen spirvConvertPtrToUGenerator(){};
+// OpGen spirvConvertSToFGenerator(){};
+// OpGen spirvConvertUToFGenerator(){};
+// OpGen spirvConvertUToPtrGenerator(){};
+// OpGen spirvCopyMemoryGenerator(){};
+// OpGen spirvEXTAtomicFAddGenerator(){};
+// OpGen spirvEntryPointGenerator(){};
+// OpGen spirvExecutionModeGenerator(){};
+// OpGen spirvFAddGenerator(){};
+// OpGen spirvFConvertGenerator(){};
+// OpGen spirvFDivGenerator(){};
+// OpGen spirvFModGenerator(){};
+// OpGen spirvFMulGenerator(){};
 
 // TODO- matrix
-OpGenerator spirvFNegateGenerator() {
+OpGen spirvFNegateGenerator() {
   return getSPIRVFUnaryOpGenerator<spirv::FNegateOp>("spirv.FNegate");
 }
 
-OpGenerator spirvFOrdEqualGenerator() {
+OpGen spirvFOrdEqualGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FOrdEqualOp>("spirv.FOrdEqual");
 }
 
-OpGenerator spirvFOrdGreaterThanEqualGenerator() {
+OpGen spirvFOrdGreaterThanEqualGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FOrdGreaterThanEqualOp>(
       "spriv.FOrdGreaterThanEqual");
 }
 
-OpGenerator spirvFOrdGreaterThanGenerator() {
+OpGen spirvFOrdGreaterThanGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FOrdGreaterThanOp>(
       "spriv.FOrdGreaterThan");
 }
 
-OpGenerator spirvFOrdLessThanEqualGenerator() {
+OpGen spirvFOrdLessThanEqualGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FOrdLessThanEqualOp>(
       "spirv.FOrdLessThanEqual");
 }
 
-OpGenerator spirvFOrdLessThanGenerator() {
+OpGen spirvFOrdLessThanGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FOrdLessThanOp>(
       "spirv.FOrdLessThan");
 }
-OpGenerator spirvFOrdNotEqualGenerator() {
+OpGen spirvFOrdNotEqualGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FOrdNotEqualOp>(
       "spirv.FOrdNotEqual");
 }
 
-OpGenerator spirvFUnordEqualGenerator() {
+OpGen spirvFUnordEqualGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FUnordEqualOp>(
       "spirv.FUnordEqual");
 }
 
-OpGenerator spirvFUnordGreaterThanEqualGenerator() {
+OpGen spirvFUnordGreaterThanEqualGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FUnordGreaterThanEqualOp>(
       "spirv.FUnordGreaterThanEqual");
 }
 
-OpGenerator spirvFUnordGreaterThanGenerator() {
+OpGen spirvFUnordGreaterThanGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FUnordGreaterThanOp>(
       "spirv.FUnordGreaterThan");
 }
 
-OpGenerator spirvFUnordLessThanEqualGenerator() {
+OpGen spirvFUnordLessThanEqualGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FUnordLessThanEqualOp>(
       "spirv.FUnordLessThanEqual");
 }
 
-OpGenerator spirvFUnordLessThanGenerator() {
+OpGen spirvFUnordLessThanGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FUnordLessThanOp>(
       "spirv.FUnordLessThan");
 }
 
-OpGenerator spirvFUnordNotEqualGenerator() {
+OpGen spirvFUnordNotEqualGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::FUnordNotEqualOp>(
       "spirv.FUnordNotEqual");
 }
 
-OpGenerator spirvIEqualGenerator() {
+OpGen spirvIEqualGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::IEqualOp>("spirv.IEqual");
 }
 
-OpGenerator spirvINotEqualGenerator() {
+OpGen spirvINotEqualGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::INotEqualOp>(
       "spirv.INotEqual");
 }
 
-template <typename T>
-OpGenerator getSPIRVBoolBinaryOpGenerator(std::string opName) {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
-    auto candidates = region.pool.searchCandidatesFrom(
-        {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
-          return isValidUnaryOperand<IntegerType>(t, {1}, {2, 3, 4, 8, 16});
-        });
-    if (candidates.empty()) {
-      candidates.push_back(
-          region.pool.generateInteger(builder, loc, builder.getI1Type()));
-    }
-    auto operand = sampleTypedValueFrom(candidates, opName);
-    auto operand2Candidates = region.pool.searchCandidatesFrom(
-        {PoolType::Vector, PoolType::IntOrFloat},
-        [&](TypeValue t) { return t.type == operand.val.getType(); });
-    auto op = builder.create<T>(
-        loc, operand.val, sampleTypedValueFrom(operand2Candidates, opName).val);
-    auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
-    return op.getOperation();
-  };
-}
-
-OpGenerator spirvLogicalEqualGenerator() {
+OpGen spirvLogicalEqualGenerator() {
   return getSPIRVBoolBinaryOpGenerator<spirv::LogicalEqualOp>(
       "spirv.LogicalEqual");
 }
 
-OpGenerator spirvLogicalNotGenerator() {
+OpGen spirvLogicalNotGenerator() {
   return getSPIRVBoolUnaryOpGenerator<spirv::LogicalNotOp>("spirv.LogicalNot");
 }
 
-OpGenerator spirvLogicalNotEqualGenerator() {
+OpGen spirvLogicalNotEqualGenerator() {
   return getSPIRVBoolBinaryOpGenerator<spirv::LogicalNotEqualOp>(
       "spirv.LogicalNotEqual");
 }
 
-OpGenerator spirvLogicalAndGenerator() {
+OpGen spirvLogicalAndGenerator() {
   return getSPIRVBoolBinaryOpGenerator<spirv::LogicalAndOp>("spirv.LogicalAnd");
 }
 
-OpGenerator spirvLogicalOrGenerator() {
+OpGen spirvLogicalOrGenerator() {
   return getSPIRVBoolBinaryOpGenerator<spirv::LogicalOrOp>("spirv.LogicalOr");
 }
 
-OpGenerator spirvSGreaterThanEqualGenerator() {
+OpGen spirvSGreaterThanEqualGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::SGreaterThanEqualOp>(
       "spirv.SGreaterThanEqual");
 }
 
-OpGenerator spirvSGreaterThanGenerator() {
+OpGen spirvSGreaterThanGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::SGreaterThanOp>(
       "spirv.SGreaterThan");
 }
 
-OpGenerator spirvSLessThanEqualGenerator() {
+OpGen spirvSLessThanEqualGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::SLessThanEqualOp>(
       "spirv.SLessThanEqual");
 }
 
-OpGenerator spirvSLessThanGenerator() {
+OpGen spirvSLessThanGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::SLessThanOp>(
       "spirv.SLessEqual");
 }
 
-OpGenerator spirvUGreaterThanEqualGenerator() {
+OpGen spirvUGreaterThanEqualGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::UGreaterThanEqualOp>(
       "spirv.UGreaterThanEqual");
 }
 
-OpGenerator spirvUGreaterThanGenerator() {
+OpGen spirvUGreaterThanGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::UGreaterThanOp>(
       "spirv.UGreaterThan");
 }
 
-OpGenerator spirvULessThanEqualGenerator() {
+OpGen spirvULessThanEqualGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::ULessThanEqualOp>(
       "spirv.ULessThanEqual");
 }
 
-OpGenerator spirvULessThanGenerator() {
+OpGen spirvULessThanGenerator() {
   return getSPIRVIntLogicalBinaryOpGenerator<spirv::ULessThanOp>(
       "spirv.ULessThan");
 }
 
-OpGenerator spirvUnorderedGenerator() {
+OpGen spirvUnorderedGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::UnorderedOp>("spirv.Unordered");
 }
 
-// OpGenerator spirvFRemGenerator(){};
-// OpGenerator spirvFSubGenerator(){};
-// OpGenerator spirvFuncGenerator(){};
-// OpGenerator spirvFunctionCallGenerator(){};
-OpGenerator spirvGLAcosGenerator() {
+// OpGen spirvFRemGenerator(){};
+// OpGen spirvFSubGenerator(){};
+// OpGen spirvFuncGenerator(){};
+// OpGen spirvFunctionCallGenerator(){};
+OpGen spirvGLAcosGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLAcosOp>("spirv.GL.Acos");
 }
 
-OpGenerator spirvGLAsinGenerator() {
+OpGen spirvGLAsinGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLAsinOp>("spirv.GL.Asin");
 }
 
-OpGenerator spirvGLAtanGenerator() {
+OpGen spirvGLAtanGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLAtanOp>("spirv.GL.Atan");
 }
 
-OpGenerator spirvGLCeilGenerator() {
+OpGen spirvGLCeilGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::GLCeilOp>("spirv.GL.Ceil");
 }
 
-OpGenerator spirvGLCosGenerator() {
+OpGen spirvGLCosGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLCosOp>("spirv.GL.Cos");
 }
 
-OpGenerator spirvGLCoshGenerator() {
+OpGen spirvGLCoshGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLCoshOp>("spirv.GL.Cosh");
 }
 
-OpGenerator spirvGLExpGenerator() {
+OpGen spirvGLExpGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLExpOp>("spirv.GL.Exp");
 }
 
-OpGenerator spirvGLFAbsGenerator() {
+OpGen spirvGLFAbsGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::GLFAbsOp>("spirv.GL.FAbs");
 }
 
-OpGenerator spirvGLFSignGenerator() {
+OpGen spirvGLFSignGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::GLFSignOp>("spirv.GL.FSign");
 }
 
-OpGenerator spirvGLFloorGenerator() {
+OpGen spirvGLFloorGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::GLFloorOp>("spirv.GL.Floor");
 }
 
-OpGenerator spirvGLInverseSqrtGenerator() {
+OpGen spirvGLInverseSqrtGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::GLInverseSqrtOp>(
       "spirv.GL.InverseSqrt");
 }
 
-OpGenerator spirvGLLogGenerator() {
+OpGen spirvGLLogGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLLogOp>("spirv.GL.Log");
 }
 
-OpGenerator spirvGLRoundEvenGenerator() {
+OpGen spirvGLRoundEvenGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::GLRoundEvenOp>(
       "spirv.GL.RoundEven");
 }
 
-OpGenerator spirvGLRoundGenerator() {
+OpGen spirvGLRoundGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::GLRoundOp>("spirv.GL.Round");
 }
 
-OpGenerator spirvGLSinGenerator() {
+OpGen spirvGLSinGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLSinOp>("spirv.GL.Sin");
 }
 
-OpGenerator spirvGLSinhGenerator() {
+OpGen spirvGLSinhGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLSinhOp>("spirv.GL.Sinh");
 }
 
-OpGenerator spirvGLSqrtGenerator() {
+OpGen spirvGLSqrtGenerator() {
   return getSPIRVFloatUnaryOpGenerator<spirv::GLSqrtOp>("spirv.GL.Sqrt");
 }
 
-OpGenerator spirvGLTanGenerator() {
+OpGen spirvGLTanGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLTanOp>("spirv.GL.Tan");
 }
 
-OpGenerator spirvGLTanhGenerator() {
+OpGen spirvGLTanhGenerator() {
   return getSPIRVFloat16Or32UnaryOpGenerator<spirv::GLTanhOp>("spirv.GL.Tanh");
 }
 
-OpGenerator spirvGLFClampGenerator() {
+OpGen spirvGLFClampGenerator() {
   return getSPIRVFloatTriOpGenerator<spirv::GLFClampOp>("spirv.GL.FClamp");
 }
 
-OpGenerator spirvGLSAbsGenerator() {
+OpGen spirvGLSAbsGenerator() {
   return getSPIRVIntUnaryOpGenerator<spirv::GLSAbsOp>("spirv.GL.SAbs");
 }
 
-OpGenerator spirvGLSSignGenerator() {
+OpGen spirvGLSSignGenerator() {
   return getSPIRVIntUnaryOpGenerator<spirv::GLSSignOp>("spirv.GL.SSign");
 }
 
-OpGenerator spirvGLFMaxGenerator() {
+OpGen spirvGLFMaxGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::GLFMaxOp>("spirv.GL.FMax");
 }
 
-OpGenerator spirvGLFMinGenerator() {
+OpGen spirvGLFMinGenerator() {
   return getSPIRVFloatBinaryOpGenerator<spirv::GLFMinOp>("spirv.GL.FMin");
 }
 
-OpGenerator spirvGLFMixGenerator() {
+OpGen spirvGLFMixGenerator() {
   return getSPIRVFloatTriOpGenerator<spirv::GLFMixOp>("spirv.GL.FMix");
 }
 
-OpGenerator spirvGLFindUMsbGenerator() {
+OpGen spirvGLFindUMsbGenerator() {
   auto opName = "spirv.GL.FindUMsb";
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
+    std::cout << 1 << '\n';
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<IntegerType>(t, {32}, {2, 3, 4, 8, 16});
         });
+    std::cout << 2 << '\n';
     if (candidates.empty()) {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
+    std::cout << 1 << "xxxx" << '\n';
     auto operand = sampleTypedValueFrom(candidates, opName);
+    std::cout << 2 << '\n';
     auto op = builder.create<spirv::GLFindUMsbOp>(loc, operand.val);
+    std::cout << 1 << '\n';
     auto tval = TypeValue(op.getType(), op);
+    std::cout << 0 << '\n';
     region.pool.addTypeValue(tval, opName);
+    std::cout << 2 << '\n';
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
-OpGenerator spirvGLFmaGenerator() {
+OpGen spirvGLFmaGenerator() {
   return getSPIRVFloatTriOpGenerator<spirv::GLFmaOp>("spriv.GL.fma");
 }
 
-OpGenerator spirvGLLdexpGenerator() {
+OpGen spirvGLLdexpGenerator() {
   auto opName = "spirv.GL.Ldexp";
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates1 = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<FloatType>(t, {16, 32, 64},
@@ -889,24 +1036,27 @@ OpGenerator spirvGLLdexpGenerator() {
                       validBitWidth.end());
         });
     if (candidates2.empty()) {
-      if (isVec){
+      if (isVec) {
 
-         candidates2.push_back(region.pool.generateVector(builder, loc, ty));
+        candidates2.push_back(region.pool.generateVector(builder, loc, ty));
 
-      }else {
-        candidates2.push_back(region.pool.generateInteger(builder, loc, builder.getI32Type()));
-      }    }
+      } else {
+        candidates2.push_back(
+            region.pool.generateInteger(builder, loc, builder.getI32Type()));
+      }
+    }
     auto operand2 = sampleTypedValueFrom(candidates2, opName);
     auto op = builder.create<spirv::GLLdexpOp>(loc, operand1.val, operand2.val);
     auto tval = TypeValue(op.getType(), op);
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
-// TODO-
-OpGenerator spirvGLPowGenerator() {
-  return [&](OpBuilder &builder, Location loc, OpRegion &region) {
-    auto opName = "spirv.GL.Pow";
+
+OpGen spirvGLPowGenerator() {
+  auto opName = "spirv.GL.Pow";
+  auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<FloatType>(t, {16, 32}, {2, 3, 4, 8, 16});
@@ -926,154 +1076,155 @@ OpGenerator spirvGLPowGenerator() {
     region.pool.addTypeValue(tval, opName);
     return op.getOperation();
   };
+  return OpGen(opName, gen);
 }
 
-OpGenerator spirvGLSClampGenerator() {
+OpGen spirvGLSClampGenerator() {
   return getSPIRVIntTriOpGenerator<spirv::GLSClampOp>("spirv.GL.SClamp");
 }
 
-OpGenerator spirvGLSMaxGenerator() {
+OpGen spirvGLSMaxGenerator() {
   return getSPIRVIntBinaryOpGenerator<spirv::GLSMaxOp>("spirv.GL.SMax");
 }
 
-OpGenerator spirvGLSMinGenerator() {
+OpGen spirvGLSMinGenerator() {
   return getSPIRVIntBinaryOpGenerator<spirv::GLSMinOp>("spirv.GL.SMin");
 }
 
-OpGenerator spirvGLUMaxGenerator() {
+OpGen spirvGLUMaxGenerator() {
   return getSPIRVIntBinaryOpGenerator<spirv::GLUMaxOp>("spirv.GL.UMax");
 }
 
-OpGenerator spirvGLUMinGenerator() {
+OpGen spirvGLUMinGenerator() {
   return getSPIRVIntBinaryOpGenerator<spirv::GLUMaxOp>("spirv.GL.UMin");
 }
 
- OpGenerator spirvGLUClampGenerator() {
-   return getSPIRVIntTriOpGenerator<spirv::GLUClampOp>("spirv.GL.UClamp");
- }
-//  OpGenerator spirvGenericCastToPtrExplicitGenerator(){};
-//  OpGenerator spirvGenericCastToPtrGenerator(){};
-//  OpGenerator spirvGlobalVariableGenerator(){};
-//  OpGenerator spirvGroupBroadcastGenerator(){};
-//  OpGenerator spirvGroupFAddGenerator(){};
-//  OpGenerator spirvGroupFMaxGenerator(){};
-//  OpGenerator spirvGroupFMinGenerator(){};
-//  OpGenerator spirvGroupFMulKHRGenerator(){};
-//  OpGenerator spirvGroupIAddGenerator(){};
-//  OpGenerator spirvGroupIMulKHRGenerator(){};
-//  OpGenerator spirvGroupNonUniformBallotGenerator(){};
-//  OpGenerator spirvGroupNonUniformBroadcastGenerator(){};
-//  OpGenerator spirvGroupNonUniformElectGenerator(){};
-//  OpGenerator spirvGroupNonUniformFAddGenerator(){};
-//  OpGenerator spirvGroupNonUniformFMaxGenerator(){};
-//  OpGenerator spirvGroupNonUniformFMinGenerator(){};
-//  OpGenerator spirvGroupNonUniformFMulGenerator(){};
-//  OpGenerator spirvGroupNonUniformIAddGenerator(){};
-//  OpGenerator spirvGroupNonUniformIMulGenerator(){};
-//  OpGenerator spirvGroupNonUniformSMaxGenerator(){};
-//  OpGenerator spirvGroupNonUniformSMinGenerator(){};
-//  OpGenerator spirvGroupNonUniformShuffleDownGenerator(){};
-//  OpGenerator spirvGroupNonUniformShuffleGenerator(){};
-//  OpGenerator spirvGroupNonUniformShuffleUpGenerator(){};
-//  OpGenerator spirvGroupNonUniformShuffleXorGenerator(){};
-//  OpGenerator spirvGroupNonUniformUMaxGenerator(){};
-//  OpGenerator spirvGroupNonUniformUMinGenerator(){};
-//  OpGenerator spirvGroupSMaxGenerator(){};
-//  OpGenerator spirvGroupSMinGenerator(){};
-//  OpGenerator spirvGroupUMaxGenerator(){};
-//  OpGenerator spirvGroupUMinGenerator(){};
-//  OpGenerator spirvIAddCarryGenerator(){};
-//  OpGenerator spirvIAddGenerator(){};
-//  OpGenerator spirvIMulGenerator(){};
-//  OpGenerator spirvINTELConvertBF16ToFGenerator(){};
-//  OpGenerator spirvINTELConvertFToBF16Generator(){};
-//  OpGenerator spirvINTELJointMatrixLoadGenerator(){};
-//  OpGenerator spirvINTELJointMatrixMadGenerator(){};
-//  OpGenerator spirvINTELJointMatrixStoreGenerator(){};
-//  OpGenerator spirvINTELJointMatrixWorkItemLengthGenerator(){};
-//  OpGenerator spirvINTELSubgroupBlockReadGenerator(){};
-//  OpGenerator spirvINTELSubgroupBlockWriteGenerator(){};
-//  OpGenerator spirvISubBorrowGenerator(){};
-//  OpGenerator spirvISubGenerator(){};
-//  OpGenerator spirvImageDrefGatherGenerator(){};
-//  OpGenerator spirvImageGenerator(){};
-//  OpGenerator spirvImageQuerySizeGenerator(){};
-//  OpGenerator spirvInBoundsPtrAccessChainGenerator(){};
+OpGen spirvGLUClampGenerator() {
+  return getSPIRVIntTriOpGenerator<spirv::GLUClampOp>("spirv.GL.UClamp");
+}
+//  OpGen spirvGenericCastToPtrExplicitGenerator(){};
+//  OpGen spirvGenericCastToPtrGenerator(){};
+//  OpGen spirvGlobalVariableGenerator(){};
+//  OpGen spirvGroupBroadcastGenerator(){};
+//  OpGen spirvGroupFAddGenerator(){};
+//  OpGen spirvGroupFMaxGenerator(){};
+//  OpGen spirvGroupFMinGenerator(){};
+//  OpGen spirvGroupFMulKHRGenerator(){};
+//  OpGen spirvGroupIAddGenerator(){};
+//  OpGen spirvGroupIMulKHRGenerator(){};
+//  OpGen spirvGroupNonUniformBallotGenerator(){};
+//  OpGen spirvGroupNonUniformBroadcastGenerator(){};
+//  OpGen spirvGroupNonUniformElectGenerator(){};
+//  OpGen spirvGroupNonUniformFAddGenerator(){};
+//  OpGen spirvGroupNonUniformFMaxGenerator(){};
+//  OpGen spirvGroupNonUniformFMinGenerator(){};
+//  OpGen spirvGroupNonUniformFMulGenerator(){};
+//  OpGen spirvGroupNonUniformIAddGenerator(){};
+//  OpGen spirvGroupNonUniformIMulGenerator(){};
+//  OpGen spirvGroupNonUniformSMaxGenerator(){};
+//  OpGen spirvGroupNonUniformSMinGenerator(){};
+//  OpGen spirvGroupNonUniformShuffleDownGenerator(){};
+//  OpGen spirvGroupNonUniformShuffleGenerator(){};
+//  OpGen spirvGroupNonUniformShuffleUpGenerator(){};
+//  OpGen spirvGroupNonUniformShuffleXorGenerator(){};
+//  OpGen spirvGroupNonUniformUMaxGenerator(){};
+//  OpGen spirvGroupNonUniformUMinGenerator(){};
+//  OpGen spirvGroupSMaxGenerator(){};
+//  OpGen spirvGroupSMinGenerator(){};
+//  OpGen spirvGroupUMaxGenerator(){};
+//  OpGen spirvGroupUMinGenerator(){};
+//  OpGen spirvIAddCarryGenerator(){};
+//  OpGen spirvIAddGenerator(){};
+//  OpGen spirvIMulGenerator(){};
+//  OpGen spirvINTELConvertBF16ToFGenerator(){};
+//  OpGen spirvINTELConvertFToBF16Generator(){};
+//  OpGen spirvINTELJointMatrixLoadGenerator(){};
+//  OpGen spirvINTELJointMatrixMadGenerator(){};
+//  OpGen spirvINTELJointMatrixStoreGenerator(){};
+//  OpGen spirvINTELJointMatrixWorkItemLengthGenerator(){};
+//  OpGen spirvINTELSubgroupBlockReadGenerator(){};
+//  OpGen spirvINTELSubgroupBlockWriteGenerator(){};
+//  OpGen spirvISubBorrowGenerator(){};
+//  OpGen spirvISubGenerator(){};
+//  OpGen spirvImageDrefGatherGenerator(){};
+//  OpGen spirvImageGenerator(){};
+//  OpGen spirvImageQuerySizeGenerator(){};
+//  OpGen spirvInBoundsPtrAccessChainGenerator(){};
 
-OpGenerator spirvIsInfGenerator() {
+OpGen spirvIsInfGenerator() {
   return getSPIRVFUnaryOpGenerator<spirv::IsInfOp>("spirv.IsInf");
 }
 
-OpGenerator spirvIsNanGenerator() {
+OpGen spirvIsNanGenerator() {
   return getSPIRVFUnaryOpGenerator<spirv::IsNanOp>("spirv.IsNan");
 }
 
-// OpGenerator spirvKHRAssumeTrueGenerator(){};
-// OpGenerator spirvKHRCooperativeMatrixLengthGenerator(){};
-// OpGenerator spirvKHRCooperativeMatrixLoadGenerator(){};
-// OpGenerator spirvKHRCooperativeMatrixStoreGenerator(){};
-// OpGenerator spirvKHRSubgroupBallotGenerator(){};
-// OpGenerator spirvLoadGenerator(){};
+// OpGen spirvKHRAssumeTrueGenerator(){};
+// OpGen spirvKHRCooperativeMatrixLengthGenerator(){};
+// OpGen spirvKHRCooperativeMatrixLoadGenerator(){};
+// OpGen spirvKHRCooperativeMatrixStoreGenerator(){};
+// OpGen spirvKHRSubgroupBallotGenerator(){};
+// OpGen spirvLoadGenerator(){};
 
-// OpGenerator spirvLoopGenerator(){};
-// OpGenerator spirvMatrixTimesMatrixGenerator(){};
-// OpGenerator spirvMatrixTimesScalarGenerator(){};
-// OpGenerator spirvMemoryBarrierGenerator(){};
-// OpGenerator spirvMergeGenerator(){};
-// OpGenerator spirvModuleGenerator(){};
-// OpGenerator spirvNVCooperativeMatrixLengthGenerator(){};
-// OpGenerator spirvNVCooperativeMatrixLoadGenerator(){};
-// OpGenerator spirvNVCooperativeMatrixMulAddGenerator(){};
-// OpGenerator spirvNVCooperativeMatrixStoreGenerator(){};
+// OpGen spirvLoopGenerator(){};
+// OpGen spirvMatrixTimesMatrixGenerator(){};
+// OpGen spirvMatrixTimesScalarGenerator(){};
+// OpGen spirvMemoryBarrierGenerator(){};
+// OpGen spirvMergeGenerator(){};
+// OpGen spirvModuleGenerator(){};
+// OpGen spirvNVCooperativeMatrixLengthGenerator(){};
+// OpGen spirvNVCooperativeMatrixLoadGenerator(){};
+// OpGen spirvNVCooperativeMatrixMulAddGenerator(){};
+// OpGen spirvNVCooperativeMatrixStoreGenerator(){};
 
-// OpGenerator spirvOrderedGenerator(){};
-// OpGenerator spirvPtrAccessChainGenerator(){};
-// OpGenerator spirvPtrCastToGenericGenerator(){};
-// OpGenerator spirvReferenceOfGenerator(){};
-// OpGenerator spirvReturnGenerator(){};
-// OpGenerator spirvReturnValueGenerator(){};
-// OpGenerator spirvSConvertGenerator(){};
-// OpGenerator spirvSDivGenerator(){};
-// OpGenerator spirvSDotAccSatGenerator(){};
-// OpGenerator spirvSDotGenerator(){};
-// OpGenerator spirvSModGenerator(){};
-// OpGenerator spirvSMulExtendedGenerator(){};
+// OpGen spirvOrderedGenerator(){};
+// OpGen spirvPtrAccessChainGenerator(){};
+// OpGen spirvPtrCastToGenericGenerator(){};
+// OpGen spirvReferenceOfGenerator(){};
+// OpGen spirvReturnGenerator(){};
+// OpGen spirvReturnValueGenerator(){};
+// OpGen spirvSConvertGenerator(){};
+// OpGen spirvSDivGenerator(){};
+// OpGen spirvSDotAccSatGenerator(){};
+// OpGen spirvSDotGenerator(){};
+// OpGen spirvSModGenerator(){};
+// OpGen spirvSMulExtendedGenerator(){};
 
 // TODO-matrix
-// OpGenerator spirvSNegateGenerator() {
+// OpGen spirvSNegateGenerator() {
 //  return getSPIRVIntUnaryOpGenerator<spirv::SNegateOp>("spirv.SNegate");
 //}
 // TODO: need spirv.struct as result type.
-// OpGenerator spirvGLFrexpStructGenerator() {
+// OpGen spirvGLFrexpStructGenerator() {
 //  return
 //  getSPIRVFloatUnaryOpGenerator<spirv::GLFrexpStructOp>("spirv.GL.Frexp");
 //}
 
-// OpGenerator spirvSRemGenerator(){};
-// OpGenerator spirvSUDotAccSatGenerator(){};
-// OpGenerator spirvSUDotGenerator(){};
-// OpGenerator spirvSelectGenerator(){};
-// OpGenerator spirvSelectionGenerator(){};
-// OpGenerator spirvShiftLeftLogicalGenerator(){};
-// OpGenerator spirvShiftRightArithmeticGenerator(){};
-// OpGenerator spirvShiftRightLogicalGenerator(){};
-// OpGenerator spirvSpecConstantCompositeGenerator(){};
-// OpGenerator spirvSpecConstantGenerator(){};
-// OpGenerator spirvSpecConstantOperationGenerator(){};
-// OpGenerator spirvStoreGenerator(){};
-// OpGenerator spirvTransposeGenerator(){};
-// OpGenerator spirvUConvertGenerator(){};
-// OpGenerator spirvUDivGenerator(){};
-// OpGenerator spirvUDotAccSatGenerator(){};
-// OpGenerator spirvUDotGenerator(){};
+// OpGen spirvSRemGenerator(){};
+// OpGen spirvSUDotAccSatGenerator(){};
+// OpGen spirvSUDotGenerator(){};
+// OpGen spirvSelectGenerator(){};
+// OpGen spirvSelectionGenerator(){};
+// OpGen spirvShiftLeftLogicalGenerator(){};
+// OpGen spirvShiftRightArithmeticGenerator(){};
+// OpGen spirvShiftRightLogicalGenerator(){};
+// OpGen spirvSpecConstantCompositeGenerator(){};
+// OpGen spirvSpecConstantGenerator(){};
+// OpGen spirvSpecConstantOperationGenerator(){};
+// OpGen spirvStoreGenerator(){};
+// OpGen spirvTransposeGenerator(){};
+// OpGen spirvUConvertGenerator(){};
+// OpGen spirvUDivGenerator(){};
+// OpGen spirvUDotAccSatGenerator(){};
+// OpGen spirvUDotGenerator(){};
 
-// OpGenerator spirvUModGenerator(){};
-// OpGenerator spirvUMulExtendedGenerator(){};
-// OpGenerator spirvUndefGenerator(){};
-// OpGenerator spirvUnreachableGenerator(){};
-// OpGenerator spirvVariableGenerator(){};
-// OpGenerator spirvVectorExtractDynamicGenerator(){};
-// OpGenerator spirvVectorInsertDynamicGenerator(){};
-// OpGenerator spirvVectorShuffleGenerator(){};
-// OpGenerator spirvVectorTimesScalarGenerator(){};
-// OpGenerator spirvYieldGenerator(){};
+// OpGen spirvUModGenerator(){};
+// OpGen spirvUMulExtendedGenerator(){};
+// OpGen spirvUndefGenerator(){};
+// OpGen spirvUnreachableGenerator(){};
+// OpGen spirvVariableGenerator(){};
+// OpGen spirvVectorExtractDynamicGenerator(){};
+// OpGen spirvVectorInsertDynamicGenerator(){};
+// OpGen spirvVectorShuffleGenerator(){};
+// OpGen spirvVectorTimesScalarGenerator(){};
+// OpGen spirvYieldGenerator(){};

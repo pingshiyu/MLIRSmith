@@ -68,7 +68,9 @@ searchShapedInputFrom(ShapedType type, const std::vector<TypeValue> &pool) {
 
 TypeValue sampleTypedValueFrom(std::vector<TypeValue> candidates,
                                std::string opToBuild) {
+  std::cout << "0\n" << std::endl;
   assert(!candidates.empty());
+  std::cout << "1";
   if (diverse) {
     if (diversity.opConnections.find(opToBuild) !=
         diversity.opConnections.end()) {
@@ -94,7 +96,7 @@ TypeValue sampleTypedValueFrom(std::vector<TypeValue> candidates,
       return candidates[UR(candidates.size())];
     }
   } else {
-
+    std::cout << "non " << candidates.size();
     return candidates[UR(candidates.size())];
   }
 }

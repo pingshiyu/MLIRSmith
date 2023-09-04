@@ -166,6 +166,10 @@ int loadMLIR(llvm::SourceMgr &sourceMgr, mlir::MLIRContext &context,
 }
 
 int dumpMLIR() {
+  if (configFileName.empty()) {
+    std::cout << "No custum configuration" << std::endl;
+    is_default = false;
+  }
   initConfig(configFileName);
   mlir::DialectRegistry registry;
   mlir::func::registerAllExtensions(registry);
@@ -270,7 +274,7 @@ int main(int argc, char **argv) {
   mlir::registerPassManagerCLOptions();
 
   cl::ParseCommandLineOptions(argc, argv, "toy compiler\n");
-  //  llvm::InitLLVM(argc, argv);
+//  llvm::InitLLVM(argc, argv);
 
   switch (emitAction) {
   case Action::DumpConfig:

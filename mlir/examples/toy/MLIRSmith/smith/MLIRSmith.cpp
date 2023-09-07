@@ -56,56 +56,6 @@ struct GenOpLowering : public OpRewritePattern<toy::GenOp> {
   }
 };
 
-//===----------------------------------------------------------------------===//
-// ToyToAffine RewritePatterns: Func operations
-//===----------------------------------------------------------------------===//
-
-struct FuncOpLowering : public OpConversionPattern<toy::FuncOp> {
-  using OpConversionPattern<toy::FuncOp>::OpConversionPattern;
-
-  LogicalResult
-  matchAndRewrite(toy::FuncOp op, OpAdaptor adaptor,
-                  ConversionPatternRewriter &rewriter) const final {
-    // We only lower the main function as we expect that all other functions
-    // have been inlined.
-    if (op.getName() != "main")
-      return failure();
-
-    // Verify that the given main has no inputs and results.
-    if (op.getNumArguments() || op.getFunctionType().getNumResults()) {
-      return rewriter.notifyMatchFailure(op, [](Diagnostic &diag) {
-        diag << "expected 'main' to have 0 inputs and 0 results";
-      });
-    }
-
-    // Create a new non-toy function, with the same region.
-    auto func = rewriter.create<mlir::func::FuncOp>(op.getLoc(), op.getName(),
-                                                    op.getFunctionType());
-    rewriter.inlineRegionBefore(op.getRegion(), func.getBody(), func.end());
-    rewriter.eraseOp(op);
-    return success();
-  }
-};
-
-//===----------------------------------------------------------------------===//
-// ToyToAffine RewritePatterns: Return operations
-//===----------------------------------------------------------------------===//
-
-struct ReturnOpLowering : public OpRewritePattern<toy::ReturnOp> {
-  using OpRewritePattern<toy::ReturnOp>::OpRewritePattern;
-
-  LogicalResult matchAndRewrite(toy::ReturnOp op,
-                                PatternRewriter &rewriter) const final {
-    // During this lowering, we expect that all function calls have been
-    // inlined.
-    if (op.hasOperand())
-      return failure();
-
-    // We lower "toy.return" directly to "std.return".
-    rewriter.replaceOpWithNewOp<func::ReturnOp>(op);
-    return success();
-  }
-};
 
 namespace {
 struct MLIRSmithPass
@@ -145,13 +95,11 @@ void MLIRSmithPass::runOnOperation() {
   // to be updated though (as we convert from TensorType to MemRefType), so we
   // only treat it as `legal` if its operands are legal.
   target.addIllegalDialect<toy::ToyDialect>();
-  target.addDynamicallyLegalOp<toy::PrintOp>(
-      [](toy::PrintOp op) { return true; });
 
   // Now that the conversion target has been defined, we just need to provide
   // the set of patterns that will lower the Toy operations.
   RewritePatternSet patterns(&getContext());
-  patterns.add<FuncOpLowering, GenOpLowering, ReturnOpLowering>(&getContext());
+  patterns.add<GenOpLowering>(&getContext());
 
   // With the target and rewrite patterns defined, we can now attempt the
   // conversion. The conversion will signal failure if any of our `illegal`

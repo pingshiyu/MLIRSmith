@@ -19,11 +19,13 @@ namespace mlir {
 class Pass;
 
 namespace toy {
-std::unique_ptr<Pass> createShapeInferencePass();
+// Count coverages
+std::unique_ptr<mlir::Pass> createOpPrinterPass();
 
-/// Create a pass for lowering to operations in the `Affine` and `Std` dialects,
-/// for a subset of the Toy IR (e.g. matmul).
-std::unique_ptr<mlir::Pass> createLowerToAffinePass();
+// Entrance of MLIRSmith.
+std::unique_ptr<mlir::Pass> createMLIRSmithPass();
+
+int printConfig();
 
 } // namespace toy
 } // namespace mlir

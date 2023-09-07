@@ -24,7 +24,6 @@
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "toy/Dialect.h"
-#include "toy/Passes.h"
 #include "llvm/ADT/Sequence.h"
 using namespace mlir;
 

@@ -18,26 +18,6 @@ add_toy_chapter(toyc-ch5
   mlir/LowerToAffineLoops.cpp
   mlir/ShapeInferencePass.cpp
   mlir/ToyCombine.cpp
-  smith/MLIRSmith.cpp
-  smith/generators/OpGeneratorProvider.cpp
-  smith/generators/ArithGeneratorProvider.cpp
-  smith/generators/BufferizationGeneratorProvider.cpp
-  smith/generators/IndexGeneratorProvider.cpp
-  smith/generators/LinalgGeneratorProvider.cpp
-  smith/generators/MathGeneratorProvider.cpp
-  smith/generators/MemrefGeneratorProvider.cpp
-  smith/generators/FuncGeneratorProvider.cpp
-  smith/generators/SCFGeneratorProvider.cpp
-  smith/generators/SPIRVGeneratorProvider.cpp
-  smith/generators/TensorGeneratorProvider.cpp
-  smith/generators/VectorGeneratorProvider.cpp
-  smith/ValueGeneration.cpp
-  smith/Util.cpp
-  smith/RegionGeneration.cpp
-  smith/TypedValuePool.cpp
-  smith/TypeValue.cpp
-  smith/generators/AffineGeneratorProvider.cpp
-  smith/OpPrinterPass.cpp
   DEPENDS
   ToyCh5ShapeInferenceInterfaceIncGen
   ToyCh5OpsIncGen

@@ -7,126 +7,62 @@
 #include "include/smith/generators/OpGeneration.h"
 
 void registerSPIRVGenerators() {
-  std::vector<OpGen> spirvGens = {spirvBitCountGenerator(),
-                                  spirvBitReverseGenerator(),
-                                  spirvFNegateGenerator(),
-                                  spirvIsInfGenerator(),
-                                  spirvIsNanGenerator(),
-                                  spirvLogicalNotGenerator(),
-                                  spirvNotGenerator(),
-                                  spirvBitFieldInsertGenerator(),
-                                  spirvBitFieldSExtractGenerator(),
-                                  spirvBitFieldUExtractGenerator(),
-                                  spirvBitwiseAndGenerator(),
-                                  spirvBitwiseOrGenerator(),
-                                  spirvBitwiseXorGenerator(),
-                                  spirvCLCeilGenerator(),
-                                  spirvCLCosGenerator(),
-                                  spirvCLErfGenerator(),
-                                  spirvCLExpGenerator(),
-                                  spirvCLFAbsGenerator(),
-                                  spirvCLFloorGenerator(),
-                                  spirvCLLogGenerator(),
-                                  spirvCLRintGenerator(),
-                                  spirvCLRoundGenerator(),
-                                  spirvCLRsqrtGenerator(),
-                                  spirvCLSinGenerator(),
-                                  spirvCLSqrtGenerator(),
-                                  spirvCLTanhGenerator(),
-                                  spirvBitwiseOrGenerator(),
-                                  spirvBitwiseXorGenerator(),
-                                  spirvCLCeilGenerator(),
-                                  spirvCLCosGenerator(),
-                                  spirvCLErfGenerator(),
-                                  spirvCLExpGenerator(),
-                                  spirvCLFAbsGenerator(),
-                                  spirvCLFloorGenerator(),
-                                  spirvCLLogGenerator(),
-                                  spirvCLRintGenerator(),
-                                  spirvCLRoundGenerator(),
-                                  spirvCLRsqrtGenerator(),
-                                  spirvCLSinGenerator(),
-                                  spirvCLSqrtGenerator(),
-                                  spirvCLTanhGenerator(),
-                                  spirvFOrdEqualGenerator(),
-                                  spirvFOrdGreaterThanEqualGenerator(),
-                                  spirvFOrdGreaterThanGenerator(),
-                                  spirvFOrdLessThanEqualGenerator(),
-                                  spirvFOrdLessThanGenerator(),
-                                  spirvFOrdNotEqualGenerator(),
-                                  spirvFUnordEqualGenerator(),
-                                  spirvFUnordGreaterThanEqualGenerator(),
-                                  spirvFUnordGreaterThanGenerator(),
-                                  spirvFUnordLessThanEqualGenerator(),
-                                  spirvFUnordLessThanGenerator(),
-                                  spirvFUnordNotEqualGenerator(),
-                                  spirvIEqualGenerator(),
-                                  spirvINotEqualGenerator(),
-                                  spirvLogicalAndGenerator(),
-                                  spirvLogicalOrGenerator(),
-                                  spirvLogicalEqualGenerator(),
-                                  spirvLogicalNotEqualGenerator(),
-                                  spirvSGreaterThanEqualGenerator(),
-                                  spirvSGreaterThanGenerator(),
-                                  spirvSLessThanEqualGenerator(),
-                                  spirvSLessThanGenerator(),
-                                  spirvUGreaterThanEqualGenerator(),
-                                  spirvUGreaterThanGenerator(),
-                                  spirvULessThanEqualGenerator(),
-                                  spirvULessThanGenerator(),
-                                  spirvUnorderedGenerator(),
-                                  spirvGLAcosGenerator(),
-                                  spirvGLAsinGenerator(),
-                                  spirvGLAtanGenerator(),
-                                  spirvGLCeilGenerator(),
-                                  spirvGLCosGenerator(),
-                                  spirvGLCoshGenerator(),
-                                  spirvGLExpGenerator(),
-                                  spirvGLFAbsGenerator(),
-                                  spirvGLFSignGenerator(),
-                                  spirvGLFloorGenerator(),
-                                  spirvGLInverseSqrtGenerator(),
-                                  spirvGLLogGenerator(),
-                                  spirvGLRoundEvenGenerator(),
-                                  spirvGLRoundGenerator(),
-                                  spirvGLSinGenerator(),
-                                  spirvGLSinhGenerator(),
-                                  spirvGLSqrtGenerator(),
-                                  spirvGLTanGenerator(),
-                                  spirvGLTanhGenerator(),
-                                  spirvGLFClampGenerator(),
-                                  spirvGLFMaxGenerator(),
-                                  spirvGLFMinGenerator(),
-                                  spirvGLFMixGenerator(),
-//                                  spirvGLFindUMsbGenerator(), //TODO
-                                  spirvGLFmaGenerator(),
-                                  spirvGLLdexpGenerator(),
-                                  spirvGLPowGenerator(),
-                                  spirvGLSAbsGenerator(),
-                                  spirvGLSClampGenerator(),
-                                  spirvGLSMaxGenerator(),
-                                  spirvGLSMinGenerator(),
-                                  spirvGLSSignGenerator(),
-                                  spirvGLUClampGenerator(),
-                                  spirvGLUMaxGenerator(),
-                                  spirvGLUMinGenerator(),
-                                  spirvCLFMaxGenerator(),
-                                  spirvCLFMinGenerator(),
-                                  spirvCLFmaGenerator(),
-                                  spirvCLPowGenerator(),
-                                  spirvCLSAbsGenerator(),
-                                  spirvCLSMaxGenerator(),
-                                  spirvCLSMinGenerator(),
-                                  spirvCLUMaxGenerator(),
-                                  spirvCLUMinGenerator()};
+  std::vector<OpGen> spirvGens = {
+      spirvBitCountGenerator(), spirvBitReverseGenerator(),
+      spirvFNegateGenerator(), spirvIsInfGenerator(), spirvIsNanGenerator(),
+      spirvLogicalNotGenerator(), spirvNotGenerator(),
+      spirvBitFieldInsertGenerator(), spirvBitFieldSExtractGenerator(),
+      spirvBitFieldUExtractGenerator(), spirvBitwiseAndGenerator(),
+      spirvBitwiseOrGenerator(), spirvBitwiseXorGenerator(),
+      spirvCLCeilGenerator(), spirvCLCosGenerator(), spirvCLErfGenerator(),
+      spirvCLExpGenerator(), spirvCLFAbsGenerator(), spirvCLFloorGenerator(),
+      spirvCLLogGenerator(), spirvCLRintGenerator(), spirvCLRoundGenerator(),
+      spirvCLRsqrtGenerator(), spirvCLSinGenerator(), spirvCLSqrtGenerator(),
+      spirvCLTanhGenerator(), spirvBitwiseOrGenerator(),
+      spirvBitwiseXorGenerator(), spirvCLCeilGenerator(), spirvCLCosGenerator(),
+      spirvCLErfGenerator(), spirvCLExpGenerator(), spirvCLFAbsGenerator(),
+      spirvCLFloorGenerator(), spirvCLLogGenerator(), spirvCLRintGenerator(),
+      spirvCLRoundGenerator(), spirvCLRsqrtGenerator(), spirvCLSinGenerator(),
+      spirvCLSqrtGenerator(), spirvCLTanhGenerator(), spirvFOrdEqualGenerator(),
+      spirvFOrdGreaterThanEqualGenerator(), spirvFOrdGreaterThanGenerator(),
+      spirvFOrdLessThanEqualGenerator(), spirvFOrdLessThanGenerator(),
+      spirvFOrdNotEqualGenerator(), spirvFUnordEqualGenerator(),
+      spirvFUnordGreaterThanEqualGenerator(), spirvFUnordGreaterThanGenerator(),
+      spirvFUnordLessThanEqualGenerator(), spirvFUnordLessThanGenerator(),
+      spirvFUnordNotEqualGenerator(), spirvIEqualGenerator(),
+      spirvINotEqualGenerator(), spirvLogicalAndGenerator(),
+      spirvLogicalOrGenerator(), spirvLogicalEqualGenerator(),
+      spirvLogicalNotEqualGenerator(), spirvSGreaterThanEqualGenerator(),
+      spirvSGreaterThanGenerator(), spirvSLessThanEqualGenerator(),
+      spirvSLessThanGenerator(), spirvUGreaterThanEqualGenerator(),
+      spirvUGreaterThanGenerator(), spirvULessThanEqualGenerator(),
+      spirvULessThanGenerator(), spirvUnorderedGenerator(),
+      spirvGLAcosGenerator(), spirvGLAsinGenerator(), spirvGLAtanGenerator(),
+      spirvGLCeilGenerator(), spirvGLCosGenerator(), spirvGLCoshGenerator(),
+      spirvGLExpGenerator(), spirvGLFAbsGenerator(), spirvGLFSignGenerator(),
+      spirvGLFloorGenerator(), spirvGLInverseSqrtGenerator(),
+      spirvGLLogGenerator(), spirvGLRoundEvenGenerator(),
+      spirvGLRoundGenerator(), spirvGLSinGenerator(), spirvGLSinhGenerator(),
+      spirvGLSqrtGenerator(), spirvGLTanGenerator(), spirvGLTanhGenerator(),
+      spirvGLFClampGenerator(), spirvGLFMaxGenerator(), spirvGLFMinGenerator(),
+      spirvGLFMixGenerator(), // spirvGLFindUMsbGenerator(), //TODO
+      spirvGLFmaGenerator(), spirvGLLdexpGenerator(), spirvGLPowGenerator(),
+      spirvGLSAbsGenerator(), spirvGLSClampGenerator(), spirvGLSMaxGenerator(),
+      spirvGLSMinGenerator(), spirvGLSSignGenerator(), spirvGLUClampGenerator(),
+      spirvGLUMaxGenerator(), spirvGLUMinGenerator(), spirvCLFMaxGenerator(),
+      spirvCLFMinGenerator(), spirvCLFmaGenerator(), spirvCLPowGenerator(),
+      spirvCLSAbsGenerator(), spirvCLSMaxGenerator(), spirvCLSMinGenerator(),
+      spirvCLUMaxGenerator(), spirvCLUMinGenerator()};
 
   for (auto gen : spirvGens) {
     operators.insert(std::make_pair(gen.opName, gen));
     opsForFunc.insert(gen.opName);
     auto pos = gen.opName.find(".");
     auto dialect = gen.opName.substr(0, pos);
-    auto id = gen.opName.substr(pos+1, gen.opName.size());
-    conf.supported_ops.push_back(OpConf(dialect, id, UR(priority_base), {}));
+    auto id = gen.opName.substr(pos + 1, gen.opName.size());
+    if (is_default_config) {
+      conf.supported_ops.push_back(OpConf(dialect, id, UR(priority_base), {}));
+    }
   }
 }
 
@@ -968,25 +904,18 @@ OpGen spirvGLFMixGenerator() {
 OpGen spirvGLFindUMsbGenerator() {
   auto opName = "spirv.GL.FindUMsb";
   auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
-    std::cout << 1 << '\n';
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<IntegerType>(t, {32}, {2, 3, 4, 8, 16});
         });
-    std::cout << 2 << '\n';
     if (candidates.empty()) {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
-    std::cout << 1 << "xxxx" << '\n';
     auto operand = sampleTypedValueFrom(candidates, opName);
-    std::cout << 2 << '\n';
     auto op = builder.create<spirv::GLFindUMsbOp>(loc, operand.val);
-    std::cout << 1 << '\n';
     auto tval = TypeValue(op.getType(), op);
-    std::cout << 0 << '\n';
     region.pool.addTypeValue(tval, opName);
-    std::cout << 2 << '\n';
     return op.getOperation();
   };
   return OpGen(opName, gen);

@@ -11,7 +11,7 @@
 #include <iostream>
 using json = nlohmann::json;
 
-inline bool is_default = false;
+inline bool is_default_config = true;
 
 const int priority_base = 100;
 const int integer_set_num = 16;

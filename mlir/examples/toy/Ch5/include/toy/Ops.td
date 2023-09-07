@@ -254,27 +254,6 @@ def MulOp : Toy_Op<"mul",
   ];
 }
 
-
-def GenOp : Toy_Op<"gen", [ ]> {
-  let summary = "lowering down to operator";
-  let description = [{
-      The "gen" operation is the entrance of fuzzing process.
-  }];
-
-
-  // The return operation takes an optional input operand to return. This
-  // value must match the return type of the enclosing function.
-  let arguments = (ins Variadic<F64Tensor>:$input);
-
-  // The return operation only emits the input in the format if it is present.
-  let assemblyFormat = "($input^ `:` type($input))? attr-dict ";
-
-  // Allow building a GenOp with no return operand.
-  let builders = [
-    OpBuilder<(ins), [{ build($_builder, $_state, std::nullopt); }]>
-  ];
-}
-
 //===----------------------------------------------------------------------===//
 // PrintOp
 //===----------------------------------------------------------------------===//

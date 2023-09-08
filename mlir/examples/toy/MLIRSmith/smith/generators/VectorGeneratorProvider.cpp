@@ -1488,7 +1488,7 @@ OpGenerator vectorWarpExecuteOnLane0Op() {
     auto point = builder.saveInsertionPoint();
     builder.setInsertionPointToEnd(&op.getRegion().front());
 
-    OpRegion region("vector.warp_execute_on_lane0", parent.depth + 1);
+    OpRegion region("vector.warp_execute_on_lane0", parent.depth + 1, parent.cur_child);
     region.pool.merge(parent.pool);
     RegionGen gen(&region, {OpNameFilter(opsForVectorWarpExecuteOnLane0)});
     gen.apply(builder, loc, 8);

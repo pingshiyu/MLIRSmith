@@ -154,7 +154,7 @@ OpGenerator linalgGenericGenerator() {
         /*iteratorTypes=*/iteratorTypes,
         /*bodyBuilder=*/
         [&](OpBuilder &b, Location loc, ValueRange args) {
-          auto region = OpRegion("linalg.generic", parent.depth + 1);
+          auto region = OpRegion("linalg.generic", parent.depth + 1, parent.cur_child);
           for (auto it = args.begin(); it < args.end(); ++it) {
             auto tVal = TypeValue(elemTy, *it);
             region.pool.addElement(tVal, "linalg.generic(arg)");
@@ -389,7 +389,7 @@ OpGenerator linalgMapGenerator() {
     Block *block = builder.createBlock(&val.getMapper());
     block->addArguments(TypeRange(types), locs);
 
-    OpRegion region("linalg.map", parent.depth + 1);
+    OpRegion region("linalg.map", parent.depth + 1, parent.cur_child);
     for (auto arg : block->getArguments()) {
       region.pool.addElement(TypeValue(shape.getElementType(), arg),
                              "arg(linalg.map)");
@@ -485,7 +485,7 @@ OpGenerator linalgReduceGenerator() {
     auto op = builder.create<linalg::ReduceOp>(
         loc, ValueRange(operand.val), ValueRange(init.val), dimensions,
         [&](OpBuilder &b, Location l, ValueRange args) {
-          OpRegion region("", parent.depth + 1);
+          OpRegion region("", parent.depth + 1, parent.cur_child);
           for (auto arg : args) {
             region.pool.addTypeValue(TypeValue(arg.getType(), arg),
                                      "arg(linalg.reduce");

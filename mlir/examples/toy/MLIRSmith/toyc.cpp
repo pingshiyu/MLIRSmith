@@ -12,6 +12,7 @@
 #include "mlir/Dialect/Func/Extensions/AllExtensions.h"
 #include "smith/DiversityCriteria.h"
 #include "smith/ExpSetting.h"
+#include "smith/TmplInstantiation.h"
 #include "smith/config.h"
 #include "smith/generators/OpGeneration.h"
 #include "toy/Dialect.h"
@@ -53,7 +54,6 @@
 #include "mlir/Dialect/Vector/IR/VectorOps.h"
 #include "mlir/Dialect/X86Vector/X86VectorDialect.h"
 
-#include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/IR/AsmState.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/MLIRContext.h"
@@ -91,26 +91,27 @@ namespace {
 enum Action {
   None,
   DumpConfig,
-  DumpMLIR,
   DumpTmpl,
-  DumpMLIRAffine,
+  TmplInstantiation,
   MLIRSmith,
   CoveredOp
 };
 } // namespace
+
 static cl::opt<enum Action> emitAction(
     "emit", cl::desc("Select the kind of output desired"),
-    cl::values(clEnumValN(DumpMLIR, "mlir", "output the MLIR dump")),
     cl::values(clEnumValN(DumpConfig, "config",
                           "output the randomly generated configuration")),
-    cl::values(clEnumValN(DumpMLIRAffine, "mlir-affine",
+    cl::values(clEnumValN(MLIRSmith, "mlir-affine",
                           "output the MLIR dump after affine lowering")),
-    cl::values(clEnumValN(DumpTmpl, "tmpl-gen", "generate MLIR templates")),
+    cl::values(clEnumValN(DumpTmpl, "tmpl-gen",
+                          "generate MLIR template randomly")),
+    cl::values(clEnumValN(TmplInstantiation, "tmpl-inst",
+                          "instantiate MLIR template")),
     cl::values(clEnumValN(CoveredOp, "covered-op",
                           "print covered ops for given input mlir program")));
 
 static cl::opt<bool> enableOpt("opt", cl::desc("Enable optimizations"));
-
 
 int loadMLIR(llvm::SourceMgr &sourceMgr, mlir::MLIRContext &context,
              mlir::OwningOpRef<mlir::ModuleOp> &module) {
@@ -129,6 +130,25 @@ int loadMLIR(llvm::SourceMgr &sourceMgr, mlir::MLIRContext &context,
     llvm::errs() << "Error can't load file " << inputFilename << "\n";
     return 3;
   }
+  return 0;
+}
+
+int instantiateTmpl(mlir::MLIRContext &context) {
+
+  std::cout << "Instantiating template: " + inputFilename << std::endl;
+  json tmpl;
+  std::ifstream tmplFile(inputFilename);
+  tmpl = json::parse(tmplFile, nullptr, false);
+  if (tmpl.is_discarded()) {
+    llvm::errs() << "template parse error"
+                 << "\n";
+    return 6;
+  }
+  mlir::OwningOpRef<mlir::ModuleOp> module = tmplInstantiation(context, tmpl);
+  if (!module) {
+    return 1;
+  }
+  module->dump();
   return 0;
 }
 
@@ -183,6 +203,10 @@ int dumpMLIR() {
   context.getOrLoadDialect<mlir::vector::VectorDialect>();
   context.getOrLoadDialect<mlir::x86vector::X86VectorDialect>();
 
+  if (emitAction == Action::TmplInstantiation) {
+    return instantiateTmpl(context);
+  }
+
   mlir::OwningOpRef<mlir::ModuleOp> module;
   llvm::SourceMgr sourceMgr;
   mlir::SourceMgrDiagnosticHandler sourceMgrHandler(sourceMgr, &context);
@@ -194,22 +218,18 @@ int dumpMLIR() {
   if (mlir::failed(mlir::applyPassManagerCLOptions(pm)))
     return 4;
 
-  // Check to see what granularity of MLIR we are compiling to.
-  if (emitAction == Action::DumpMLIRAffine) {
-    // Generate MLIR program from scratch.
+  // Generate MLIR program from scratch.
+  if (emitAction == Action::MLIRSmith) {
     pm.addPass(mlir::toy::createMLIRSmithPass());
   }
-
   if (emitAction == Action::CoveredOp) {
     pm.addPass(mlir::toy::createOpPrinterPass());
   }
 
   if (mlir::failed(pm.run(*module)))
     return 4;
-
   module->dump();
 
-  diversity.exportSelf("cov.json");
   return 0;
 }
 
@@ -218,8 +238,42 @@ int dumpConfig() {
   return 0;
 }
 
+json createRegion(std::string opName, int depth) {
+  json region;
+  int maxDepth = 3;
+  int maxLength = 128;
+  if (depth >= maxDepth || opNests.find(opName) == opNests.end()) {
+    region = opName;
+    return region;
+  }
+  auto ops = std::vector(opNests[opName].begin(), opNests[opName].end());
+
+  std::vector<json> opSeq;
+  for (int i = 0; i < UR(maxLength); ++i) {
+    int idx = UR(ops.size());
+    auto op = ops[idx];
+    if (opNests.find(op) == opNests.end()) {
+      opSeq.push_back(createRegion(op, depth + 1));
+    }
+  }
+  region[opName] = opSeq;
+  return region;
+}
+
 int dumpTmpl() {
-//  operators
+  json tmpl;
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+
+  /* using nano-second instead of seconds */
+  srand((time_t)ts.tv_nsec);
+
+  std::vector<json> funcs;
+  for (int i = 0; i < func_num; ++i) {
+    funcs.push_back(createRegion("func.func", 0));
+  }
+  tmpl["builtin.module"] = funcs;
+  std::cout << tmpl.dump(4) << "\n";
   return 0;
 }
 
@@ -230,20 +284,20 @@ int main(int argc, char **argv) {
   mlir::registerPassManagerCLOptions();
 
   cl::ParseCommandLineOptions(argc, argv, "toy compiler\n");
-//  llvm::InitLLVM(argc, argv);
+  llvm::InitLLVM(argc, argv);
 
   switch (emitAction) {
   case Action::DumpConfig:
     return dumpConfig();
-  case Action::DumpMLIR:
-  case Action::DumpMLIRAffine:
+  case Action::MLIRSmith:
   case Action::CoveredOp:
+  case Action::TmplInstantiation:
     return dumpMLIR();
   case Action::DumpTmpl:
     return dumpTmpl();
-  default:
-    llvm::errs() << "No action specified (parsing only?), use -emit=<action>\n";
+  default: {
+    emitAction = Action::MLIRSmith;
+    return dumpMLIR();
   }
-
-  return 0;
+  }
 }

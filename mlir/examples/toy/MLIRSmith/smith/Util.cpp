@@ -408,7 +408,7 @@ std::vector<AffineExpr> randomAffineExprs(OpBuilder &builder, int dimNum,
 }
 
 void debugPrint(std::string str) {
-  if (conf.debug) {
+  if (true) {
     std::cout << str << std::endl;
   }
 }

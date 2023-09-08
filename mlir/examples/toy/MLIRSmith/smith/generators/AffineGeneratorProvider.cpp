@@ -52,7 +52,7 @@ OpGenerator affineForGenerator() {
 
     auto blockBuilder = [&](OpBuilder &b, Location loc,
                             Value iv /*loop iterator*/, ValueRange args) {
-      auto region = OpRegion("affine.for", parent.depth + 1);
+      auto region = OpRegion("affine.for", parent.depth + 1, parent.cur_child);
       region.pool.merge(parent.pool);
       region.pool.addIndex(TypeValue(b.getIndexType(), iv), "iter(affine.for)");
       if (hasIterArg) {
@@ -123,7 +123,7 @@ OpGenerator affineIfGenerator() {
 
     auto opFilter = OpNameFilter(opsForAffineIf);
     auto blockBuilder = [&]() {
-      OpRegion region("affine.if", parent.depth + 1);
+      OpRegion region("affine.if", parent.depth + 1, parent.cur_child);
       region.pool.merge(parent.pool);
       auto regionGen = RegionGen(&region, {opFilter});
       regionGen.apply(builder, loc, 8);
@@ -305,7 +305,7 @@ OpGenerator affineParallelGenerator() {
     auto &block = loopBody.front();
     builder.setInsertionPointToStart(&block);
     {
-      OpRegion region("affine.parallel", parent.depth + 1);
+      OpRegion region("affine.parallel", parent.depth + 1,  parent.cur_child);
       region.pool.merge(parent.pool);
       auto args = loopBody.getArguments();
       for (uint i = 0; i < args.size(); ++i) {

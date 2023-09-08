@@ -13,6 +13,7 @@ using json = nlohmann::json;
 
 inline bool is_default_config = true;
 
+const int func_num = 2;
 const int priority_base = 100;
 const int integer_set_num = 16;
 const int integer_set_exprs_ub = 4;

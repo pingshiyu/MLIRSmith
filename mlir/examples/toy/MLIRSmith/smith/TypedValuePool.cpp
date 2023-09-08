@@ -39,7 +39,6 @@ void TypedValuePool::addElement(const TypeValue &element, std::string op = "") {
                     element.type.dyn_cast<FloatType>() ||
                     element.type.dyn_cast<IndexType>());
 
-  debugPrint("calling from " + op);
   assert(typeCheck && "addElement() require Integer or Float or Index");
   if (element.type.isIntOrFloat()) {
     intOrFloatPool.push_back(element);
@@ -63,7 +62,6 @@ void TypedValuePool::addStaticShapedMemref(const TypeValue &memref,
                                            std::string op = "") {
   assert(memref.val.getType().isa<MemRefType>() &&
          memref.val.getType().dyn_cast<MemRefType>().hasStaticShape());
-  debugPrint("calling from: " + op);
   staticShapedMemrefPool.push_back(memref);
 }
 
@@ -90,7 +88,6 @@ void TypedValuePool::addRankedTensor(const TypeValue &tensor,
 
 void TypedValuePool::addStaticShapedTensor(const TypeValue &tensor,
                                            std::string op = "") {
-  debugPrint("calling from: " + op);
   assert(tensor.val);
   auto t = tensor.type.dyn_cast<RankedTensorType>();
   if (t && t.hasStaticShape()) {
@@ -103,7 +100,6 @@ void TypedValuePool::addStaticShapedTensor(const TypeValue &tensor,
 
 void TypedValuePool::addDynamicShapedTensor(const TypeValue &dynamicTensor,
                                             std::string op = "") {
-  debugPrint("calling from: " + op);
   assert(dynamicTensor.val);
   assert(dynamicTensor.type.dyn_cast<RankedTensorType>() &&
          "Require RankedTensorType here.");

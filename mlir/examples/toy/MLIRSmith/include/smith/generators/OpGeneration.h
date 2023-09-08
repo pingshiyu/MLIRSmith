@@ -30,8 +30,11 @@ struct OpRegion {
   std::vector<std::string> filter;
   std::vector<std::string> terminatorOp;
   TypedValuePool pool;
+  json tmpl;
+  json cur_child;
 
-  OpRegion(std::string op, int depth) : parent_op(op), depth(depth) {
+  OpRegion(std::string op, int depth, json tmpl = nullptr)
+      : parent_op(op), depth(depth), tmpl(tmpl) {
     pool = TypedValuePool();
     filter = std::vector<std::string>();
     terminatorOp = std::vector<std::string>();
@@ -311,7 +314,7 @@ OpGenerator tensorGatherGenerator();
 OpGenerator tensorGenerateGenerator();
 OpGenerator tensorInsertGenerator();
 OpGenerator tensorInsertSliceGenerator();
-//OpGenerator tensorPackGenerator();
+// OpGenerator tensorPackGenerator();
 OpGenerator tensorPadGenerator();
 OpGenerator tensorParallelInsertSliceGenerator();
 OpGenerator tensorRankGenerator();
@@ -345,7 +348,6 @@ OpGenerator indexShrUGenerator();
 OpGenerator indexSizeOfGenerator();
 OpGenerator indexSubGenerator();
 OpGenerator indexXorGenerator();
-
 
 /*-------------- SPIRV generators -------------*/
 void registerSPIRVGenerators();
@@ -611,7 +613,6 @@ OpGen spirvVectorShuffleGenerator();
 OpGen spirvVectorTimesScalarGenerator();
 OpGen spirvYieldGenerator();
 
-
 // generator registration
 inline std::map<std::string, OpGen> operators = {
     {"func.func", OpGen("func.func", funcGenerator())},
@@ -774,7 +775,7 @@ inline std::map<std::string, OpGen> operators = {
      OpGen("tensor.from_elements", tensorFromElementsGenerator())},
     {"tensor.generate", OpGen("tensor.generate", tensorGenerateGenerator())},
     {"tensor.insert", OpGen("tensor.insert", tensorInsertGenerator())},
-//    {"tensor.pack", OpGen("tensor.pack", tensorPackGenerator())},
+    //    {"tensor.pack", OpGen("tensor.pack", tensorPackGenerator())},
     {"tensor.rank", OpGen("tensor.rank", tensorRankGenerator())},
     {"tensor.scatter", OpGen("tensor.scatter", tensorScatterGenerator())},
     {"tensor.splat", OpGen("tensor.splat", tensorSplatGenerator())},
@@ -827,173 +828,51 @@ struct OpGeneration {
   void apply(OpBuilder &, Location, OpRegion &);
 };
 
-inline std::set<std::string> opsForFunc = {"func.call",
-                                           "linalg.matmul",
-                                           "linalg.generic",
-                                           "linalg.map",
-                                           "linalg.copy",
-                                           "linalg.transpose",
-                                           "linalg.broadcast",
-                                           "linalg.reduce",
-                                           "linalg.dot",
-                                           "memref.alloca",
-                                           "memref.alloca_scope",
-                                           "memref.assume_alignment",
-                                           "memref.alloc",
-                                           "memref.atomic_rmw",
-                                           "memref.cast",
-                                           "memref.realloc",
-                                           "memref.tensor_store",
-                                           "memref.store",
-                                           "memref.load",
-                                           "memref.copy",
-                                           "arith.addf",
-                                           "arith.addi",
-                                           "arith.andi",
-                                           "arith.cmpf",
-                                           "arith.cmpi",
-                                           "arith.ceildivsi",
-                                           "arith.constant",
-                                           "arith.divf",
-                                           "arith.divsi",
-                                           "arith.divui",
-                                           "arith.floordivsi",
-                                           "arith.maxf",
-                                           "arith.maxsi",
-                                           "arith.maxui",
-                                           "arith.minf",
-                                           "arith.minsi",
-                                           "arith.minui",
-                                           "arith.mulf",
-                                           "arith.muli",
-                                           "arith.negf",
-                                           "arith.ori",
-                                           "arith.remf",
-                                           "arith.remsi",
-                                           "arith.remui",
-                                           "arith.shli",
-                                           "arith.shrsi",
-                                           "arith.shrui",
-                                           "arith.subf",
-                                           "arith.subi",
-                                           "arith.xori",
-                                           "math.absf",
-                                           "math.absi",
-                                           "math.atan",
-                                           "math.atan2",
-                                           "math.ceil",
-                                           "math.copySign",
-                                           "math.cos",
-                                           "math.ctlz",
-                                           "math.cttz",
-                                           "math.ctpop",
-                                           "math.exp",
-                                           "math.exp2",
-                                           "math.expm1",
-                                           "math.floor",
-                                           "math.fma",
-                                           "math.ipowi",
-                                           "math.log",
-                                           "math.log10",
-                                           "math.log1p",
-                                           "math.log2",
-                                           "math.powf",
-                                           "math.rsqrt",
-                                           "math.sqrt",
-                                           "math.tan",
-                                           "math.tanh",
-                                           "math.roundeven",
-                                           "math.round",
-                                           "math.trunc",
-                                           "math.fpowi",
-                                           "scf.if",
-                                           "scf.execute_region",
-                                           "scf.index_switch",
-                                           "scf.while",
-                                           "scf.parallel",
-                                           "affine.apply",
-                                           "affine.for",
-                                           "affine.if",
-                                           "affine.load",
-                                           "affine.store",
-                                           "affine.min",
-                                           "affine.max",
-                                           "affine.parallel",
-                                           "affine.vector_store",
-                                           "affine.vector_load",
-                                           "vector.bitcast",
-                                           "vector.broadcast",
-                                           "vector.contract",
-                                           "vector.compress_store",
-                                           "vector.create_mask",
-                                           "vector.extract",
-                                           "vector.extract_strided_slice",
-                                           "vector.fma",
-                                           "vector.flat_transpose",
-                                           "vector.insert_element",
-                                           "vector.insert",
-                                           "vector.insert_strided_slice",
-                                           "vector.load",
-                                           "vector.masked_load",
-                                           "vector.matrix_multiply",
-                                           "vector.multi_reduction",
-                                           "vector.outer_product",
-                                           "vector.print",
-                                           "vector.reduction",
-                                           "vector.scan",
-                                           "vector.scatter",
-                                           "vector.shuffle",
-                                           "vector.splat",
-                                           "vector.transpose",
-                                           "vector.gather",
-                                           "vector.mask",
-                                           "vector.transfer_read",
-                                           "vector.transfer_write",
-                                           "vector.warp_execute_on_lane0",
-                                           "tensor.cast",
-                                           "tensor.collapse_shape",
-                                           "tensor.dim",
-                                           "tensor.empty",
-                                           "tensor.expand_shape",
-                                           "tensor.extract",
-                                           "tensor.insert_slice",
-                                           "tensor.extract_slice",
-                                           "tensor.from_elements",
-                                           "tensor.generate",
-                                           "tensor.insert",
-//                                           "tensor.pack", //TODO
-                                           "tensor.rank",
-                                           "tensor.scatter",
-                                           "tensor.splat",
-                                           "tensor.unpack",
-                                           "index.add",
-                                           "index.and",
-                                           "index.bool.constant",
-                                           "index.casts",
-                                           "index.castu",
-                                           "index.ceildivs",
-                                           "index.ceildivu",
-                                           "index.constant",
-                                           "index.divs",
-                                           "index.divu",
-                                           "index.floordivs",
-                                           "index.maxs",
-                                           "index.maxu",
-                                           "index.mul",
-                                           "index.or",
-                                           "index.rems",
-                                           "index.remu",
-                                           "index.shl",
-                                           "index.shrs",
-                                           "index.shru",
-                                           "index.sizeof",
-                                           "index.sub",
-                                           "index.xor",
-                                           "bufferization.alloc_tensor",
-                                           "bufferization.clone",
-                                           "bufferization.dealloc_tensor",
-                                           "bufferization.to_memref",
-                                           "bufferization.to_tensor"};
+inline std::set<std::string> opsForFunc = {
+    "func.call", "linalg.matmul", "linalg.generic", "linalg.map", "linalg.copy",
+    "linalg.transpose", "linalg.broadcast", "linalg.reduce", "linalg.dot",
+    "memref.alloca", "memref.alloca_scope", "memref.assume_alignment",
+    "memref.alloc", "memref.atomic_rmw", "memref.cast", "memref.realloc",
+    "memref.tensor_store", "memref.store", "memref.load", "memref.copy",
+    "arith.addf", "arith.addi", "arith.andi", "arith.cmpf", "arith.cmpi",
+    "arith.ceildivsi", "arith.constant", "arith.divf", "arith.divsi",
+    "arith.divui", "arith.floordivsi", "arith.maxf", "arith.maxsi",
+    "arith.maxui", "arith.minf", "arith.minsi", "arith.minui", "arith.mulf",
+    "arith.muli", "arith.negf", "arith.ori", "arith.remf", "arith.remsi",
+    "arith.remui", "arith.shli", "arith.shrsi", "arith.shrui", "arith.subf",
+    "arith.subi", "arith.xori", "math.absf", "math.absi", "math.atan",
+    "math.atan2", "math.ceil", "math.copySign", "math.cos", "math.ctlz",
+    "math.cttz", "math.ctpop", "math.exp", "math.exp2", "math.expm1",
+    "math.floor", "math.fma", "math.ipowi", "math.log", "math.log10",
+    "math.log1p", "math.log2", "math.powf", "math.rsqrt", "math.sqrt",
+    "math.tan", "math.tanh", "math.roundeven", "math.round", "math.trunc",
+    "math.fpowi", "scf.if", "scf.execute_region", "scf.index_switch",
+    "scf.while", "scf.parallel", "affine.apply", "affine.for", "affine.if",
+    "affine.load", "affine.store", "affine.min", "affine.max",
+    "affine.parallel", "affine.vector_store", "affine.vector_load",
+    "vector.bitcast", "vector.broadcast", "vector.contract",
+    "vector.compress_store", "vector.create_mask", "vector.extract",
+    "vector.extract_strided_slice", "vector.fma", "vector.flat_transpose",
+    "vector.insert_element", "vector.insert", "vector.insert_strided_slice",
+    "vector.load", "vector.masked_load", "vector.matrix_multiply",
+    "vector.multi_reduction", "vector.outer_product", "vector.print",
+    "vector.reduction", "vector.scan", "vector.scatter", "vector.shuffle",
+    "vector.splat", "vector.transpose", "vector.gather", "vector.mask",
+    "vector.transfer_read", "vector.transfer_write",
+    "vector.warp_execute_on_lane0", "tensor.cast", "tensor.collapse_shape",
+    "tensor.dim", "tensor.empty", "tensor.expand_shape", "tensor.extract",
+    "tensor.insert_slice", "tensor.extract_slice", "tensor.from_elements",
+    "tensor.generate", "tensor.insert",
+    //                                           "tensor.pack", //TODO
+    "tensor.rank", "tensor.scatter", "tensor.splat", "tensor.unpack",
+    "index.add", "index.and", "index.bool.constant", "index.casts",
+    "index.castu", "index.ceildivs", "index.ceildivu", "index.constant",
+    "index.divs", "index.divu", "index.floordivs", "index.maxs", "index.maxu",
+    "index.mul", "index.or", "index.rems", "index.remu", "index.shl",
+    "index.shrs", "index.shru", "index.sizeof", "index.sub", "index.xor",
+    "bufferization.alloc_tensor", "bufferization.clone",
+    "bufferization.dealloc_tensor", "bufferization.to_memref",
+    "bufferization.to_tensor"};
 
 inline std::set<std::string> intOpsForGenericAtomicRMW = {
     "arith.addi",     "arith.andi",  "arith.cmpi",  "arith.ceildivsi",
@@ -1042,7 +921,7 @@ inline std::set<std::string> opsForAlloca = opsForFunc;
 inline std::set<std::string> opsForScfIf = opsForFunc;
 inline std::set<std::string> opsForScfFor = opsForFunc;
 inline std::set<std::string> opsForScfWhile = opsForFunc;
-inline std::set<std::string> opsForScfForeachThread = opsForFunc;
+// inline std::set<std::string> opsForScfForeachThread = opsForFunc;
 inline std::set<std::string> opsForExecuteRegion = opsForFunc;
 inline std::set<std::string> opsForIndexSwitch = opsForFunc;
 inline std::set<std::string> opsForLinalgMap = opsForFunc;
@@ -1056,16 +935,20 @@ inline std::set<std::string> opsForLinalgReduce = opsForFunc;
 inline std::set<std::string> opsForScfParallel = opsForFunc;
 inline std::set<std::string> opsForScfReduce = opsForFunc;
 
-inline std::map<std::string, std::set<std::string>> availableOpNests = {
+//
+inline std::map<std::string, std::set<std::string>> opNests = {
     {"func.func", opsForFunc},
     {"memref.alloca_scope", opsForAlloca},
     {"linalg.map", opsForLinalgMap},
     {"linalg.generic", opsForLinalgGeneric},
+    {"linalg.reduce", opsForLinalgReduce},
     {"scf.if", opsForScfIf},
     {"scf.execute_region", opsForExecuteRegion},
     {"scf.for", opsForScfFor},
     {"scf.while", opsForScfWhile},
     {"scf.index_switch", opsForIndexSwitch},
+    {"scf.reduce", opsForScfReduce},
+    {"scf.parallel", opsForScfParallel},
     {"affine.if", opsForAffineIf},
     {"affine.for", opsForAffineFor},
     {"affine.parallel", opsForAffineParallel},

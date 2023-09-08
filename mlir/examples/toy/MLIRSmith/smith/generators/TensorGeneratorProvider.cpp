@@ -299,7 +299,7 @@ OpGenerator tensorGenerateGenerator() {
     auto res = builder.create<tensor::GenerateOp>(
         loc, dynTenTy, dynamicSizes,
         [&](OpBuilder &b, Location loc, ValueRange args) {
-          auto region = OpRegion("tensor.generate", parent.depth + 1);
+          auto region = OpRegion("tensor.generate", parent.depth + 1, parent.cur_child);
           region.pool.merge(parent.pool);
           for (auto val : args) {
             region.pool.addIndex(TypeValue(b.getIndexType(), val),

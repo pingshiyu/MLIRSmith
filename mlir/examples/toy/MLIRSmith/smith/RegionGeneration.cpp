@@ -1,8 +1,8 @@
 //
 // Created by Stan Wang on 2022/10/31.
 //
-
 #include "smith/RegionGeneration.h"
+#include "smith/generators/OpGeneration.h"
 
 OpGen *RegionGen::selectOpGenerator() {
   assert(weights.size() == generators.size());
@@ -28,7 +28,7 @@ OpGen *RegionGen::selectOpGeneratorDiverse() {
       opsToCover.insert(op.getFullName());
     }
   }
-  for (auto op : availableOpNests[region->parent_op]) {
+  for (auto op : opNests[region->parent_op]) {
     if (diversity.ops.find(op) == diversity.ops.end()) {
       opNestsToCover.insert(op);
     }
@@ -45,11 +45,9 @@ OpGen *RegionGen::selectOpGeneratorDiverse() {
   }
 
   assert(weights.size() == generators.size());
-  debugPrint(region->parent_op);
 
   size_t id = getWeightedRandomIndex(weights);
   if (weights.empty()) {
-    debugPrint("no ops available for " + region->parent_op);
     return nullptr;
   }
   return &generators[id];
@@ -59,34 +57,58 @@ std::vector<Operation *> RegionGen::apply(OpBuilder &builder, Location loc,
                                           int opLenLimit) {
   int length = 0;
   std::vector<Operation *> operations;
-  while (true) {
-    OpGen *opGen;
-    if (diverse) {
-      opGen = selectOpGeneratorDiverse();
-    } else {
-      opGen = selectOpGenerator();
-    }
-    if (!opGen) {
-      continue;
-    }
-    auto operation = opGen->apply(builder, loc, *region);
-    if (operation) {
-      operations.push_back(operation);
-      auto current_op = operation->getName().getStringRef().str();
-      diversity.insertOp(current_op);
-      diversity.insertOpNest(region->parent_op, current_op);
-      for (const auto &item : operation->getOperands()) {
-        if (!item.getDefiningOp()) {
-          continue;
-        }
-        auto from = item.getDefiningOp()->getName().getStringRef().str();
-        diversity.insertOpConnection(from, current_op);
+  if (region->tmpl != nullptr) {
+    for (auto op : region->tmpl[region->parent_op].) {
+      debugPrint("wtf" + op.dump(4));
+      region->cur_child = op;
+      std::string opName;
+      if (op.is_string()) { // op has no region
+        opName = op;
+      } else if (op.is_object()) {
+        opName = op.items().begin().key();
       }
+      debugPrint(opName);
+      if (operators.find(opName) == operators.end()) {
+        llvm::errs() << opName << " not found in supported operations";
+        continue ;
+      }
+      auto gen = operators[opName];
+      auto operation = gen.apply(builder, loc, *region);
+      if (operation) {
+        operations.push_back(operation);
+      }
+      debugPrint("end " + opName);
     }
-    length++;
-    if (length >= opLenLimit) {
-      // generate terminator
-      break;
+  } else {
+    while (true) {
+      OpGen *opGen;
+      if (diverse) {
+        opGen = selectOpGeneratorDiverse();
+      } else {
+        opGen = selectOpGenerator();
+      }
+      if (!opGen) {
+        continue;
+      }
+      auto operation = opGen->apply(builder, loc, *region);
+      if (operation) {
+        operations.push_back(operation);
+        auto current_op = operation->getName().getStringRef().str();
+        diversity.insertOp(current_op);
+        diversity.insertOpNest(region->parent_op, current_op);
+        for (const auto &item : operation->getOperands()) {
+          if (!item.getDefiningOp()) {
+            continue;
+          }
+          auto from = item.getDefiningOp()->getName().getStringRef().str();
+          diversity.insertOpConnection(from, current_op);
+        }
+      }
+      length++;
+      if (length >= opLenLimit) {
+        // generate terminator
+        break;
+      }
     }
   }
   return operations;

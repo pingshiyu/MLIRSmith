@@ -185,7 +185,6 @@ OpGenerator allocGenerator() {
 
 OpGenerator reallocGenerator() {
   return [](OpBuilder &builder, Location loc, OpRegion &region) {
-    debugPrint("before realloc");
     auto typedValuePool = region.pool;
     // 'memref.realloc' op operand #0 must be 1D memref of any type values
     auto candidates = typedValuePool.searchCandidatesFrom(
@@ -279,7 +278,7 @@ OpGenerator genericAtomicRMWGenerator() {
         memref.type.dyn_cast<ShapedType>(), builder, loc);
     auto op = builder.create<memref::GenericAtomicRMWOp>(loc, memref.val,
                                                          ValueRange(indices));
-    auto region = OpRegion(opName, parent.depth + 1);
+    auto region = OpRegion(opName, parent.depth + 1, parent.cur_child);
     auto tVal = TypeValue(elemType, op);
     // atomic body is not empty.
     for (auto arg : op.getAtomicBody().getArguments()) {
@@ -333,7 +332,7 @@ OpGenerator allocaScopeGenerator() {
       results.push_back(randomType(builder.getContext()));
     }
     auto op = builder.create<memref::AllocaScopeOp>(loc, results);
-    auto region = OpRegion("memref.alloca_scope", parent.depth + 1);
+    auto region = OpRegion("memref.alloca_scope", parent.depth + 1, parent.cur_child);
     region.pool.merge(parent.pool);
     auto regionGen = RegionGen(&region, {opFilter});
     Block *entry = new Block();

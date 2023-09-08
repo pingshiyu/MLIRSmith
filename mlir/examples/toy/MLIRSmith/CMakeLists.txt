@@ -29,6 +29,7 @@ add_toy_chapter(mlirsmith
   smith/TypeValue.cpp
   smith/generators/AffineGeneratorProvider.cpp
   smith/OpPrinterPass.cpp
+  smith/TmplInstantiation.cpp
   DEPENDS
   MLIRSmithOpsIncGen
   )

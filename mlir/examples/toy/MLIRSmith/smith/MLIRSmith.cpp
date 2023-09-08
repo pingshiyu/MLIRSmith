@@ -48,7 +48,7 @@ struct GenOpLowering : public OpRewritePattern<toy::GenOp> {
     OpRegion region("builtin.module", 0);
     std::set<std::string> opsForModule = {"func.func"};
     auto regionGen = RegionGen(&region, {OpNameFilter(opsForModule)});
-    regionGen.apply(rewriter, loc, 2);
+    regionGen.apply(rewriter, loc, func_num);
 
     // ----------------------- End of Random Generating --------------------
     rewriter.eraseOp(op);

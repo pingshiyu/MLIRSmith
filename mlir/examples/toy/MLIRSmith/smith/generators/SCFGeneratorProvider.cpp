@@ -30,7 +30,7 @@ OpGenerator scfIfGenerator() {
     bool hasElse = !resultTypes.empty() || UR(2);
 
     auto blockBuilder = [&](OpBuilder &b, Location loc) {
-      auto region = OpRegion("scf.if", parent.depth + 1);
+      auto region = OpRegion("scf.if", parent.depth + 1, parent.cur_child);
       region.pool.merge(parent.pool);
       auto regionGen = RegionGen(&region, {opFilter});
       regionGen.apply(builder, loc, 8);
@@ -75,7 +75,7 @@ OpGenerator executeRegionGenerator() {
     }
 
     auto blockBuilder = [&](OpBuilder &b, Location loc) {
-      auto region = OpRegion("scf.execute_region", parent.depth + 1);
+      auto region = OpRegion("scf.execute_region", parent.depth + 1, parent.cur_child);
       region.pool.merge(parent.pool);
       auto regionGen = RegionGen(&region, {opFilter});
       regionGen.apply(builder, loc, 16);
@@ -144,7 +144,7 @@ OpGenerator scfForGenerator() {
 
     auto blockBuilder = [&](OpBuilder &b, Location loc,
                             Value iv /*loop iterator*/, ValueRange args) {
-      auto region = OpRegion("scf.for", parent.depth + 1);
+      auto region = OpRegion("scf.for", parent.depth + 1, parent.cur_child);
       region.pool.merge(parent.pool);
       region.pool.addIndex(TypeValue(b.getIndexType(), iv), "iter(scf.for)");
       if (hasIterArg) {
@@ -199,7 +199,7 @@ OpGenerator indexSwitchGenerator() {
     auto idxSwitchOp = builder.create<scf::IndexSwitchOp>(
         loc, TypeRange(resultTypes), arg.val, cases, caseRegionCount);
     auto blockBuilder = [&](OpBuilder &b, Location loc) {
-      OpRegion opRegion = OpRegion("scf.index_switch", parent.depth + 1);
+      OpRegion opRegion = OpRegion("scf.index_switch", parent.depth + 1, parent.cur_child);
       opRegion.pool.merge(parent.pool);
       auto regionGen = RegionGen(&opRegion, {opFilter});
       regionGen.apply(builder, loc, 16);
@@ -248,7 +248,7 @@ OpGenerator scfWhileGenerator() {
     auto resultType = operand0.type;
 
     auto doBuilder = [&](OpBuilder &b, Location loc, ValueRange args) {
-      OpRegion opRegion = OpRegion("scf.while", parent.depth + 1);
+      OpRegion opRegion = OpRegion("scf.while", parent.depth + 1, parent.cur_child);
       opRegion.pool.merge(parent.pool);
       opRegion.pool.addTypeValue(TypeValue(resultType, args.front()),
                                  "arg(scf.while)");
@@ -263,7 +263,7 @@ OpGenerator scfWhileGenerator() {
       builder.create<scf::YieldOp>(loc, ret.val);
     };
     auto condBuilder = [&](OpBuilder &b, Location loc, ValueRange args) {
-      OpRegion opRegion = OpRegion("scf.while", parent.depth + 1);
+      OpRegion opRegion = OpRegion("scf.while", parent.depth + 1, parent.cur_child);
       opRegion.pool.merge(parent.pool);
       auto regionGen = RegionGen(&opRegion, {opFilter});
       opRegion.pool.addTypeValue(TypeValue(resultType, args.front()),
@@ -320,7 +320,7 @@ OpGenerator scfWhileGenerator() {
 //    auto op = builder.create<scf::ForeachThreadOp>(
 //        loc, sharedOuts, numThreads, map,
 //        [&](OpBuilder &b, Location loc, ValueRange args) {
-//          OpRegion region("scf.foreach_thread", parent.depth + 1);
+//          OpRegion region("scf.foreach_thread", parent.depth + 1, parent.cur_child);
 //          for (auto arg : args) {
 //            region.pool.addTypeValue(TypeValue(arg.getType(), arg),
 //                                     "arg(scf.foreach_thread)");
@@ -371,7 +371,7 @@ OpGenerator scfParallelGenerator() {
     }
     auto bodyBuilder = [&](OpBuilder &b, Location loc, ValueRange ivs,
                            ValueRange args) {
-      OpRegion region("scf.parallel", parent.depth + 1);
+      OpRegion region("scf.parallel", parent.depth + 1, parent.cur_child);
       for (auto arg : ivs) {
         region.pool.addIndex(TypeValue(arg.getType(), arg), "iv(scf.parallel)");
       }

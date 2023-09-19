@@ -46,18 +46,12 @@ OpGenerator bufferizationAllocTensorGenerator() {
 
 OpGenerator bufferizationCloneGenerator() {
   return [](OpBuilder &builder, Location loc, OpRegion &region) {
-    debugPrint("1");
     auto memrefCandidates = region.pool.getCandidatesFromStaticShapedMemref(
         builder, loc, randomStaticShapedMemrefType(builder.getContext()));
-    debugPrint("2");
     auto mem = sampleTypedValueFrom(memrefCandidates, "bufferization.clone");
-    //    std::cout
-    debugPrint("1");
     auto op = builder.create<bufferization::CloneOp>(loc, mem.val);
-    debugPrint("2");
     region.pool.addStaticShapedMemref(TypeValue(mem.type, op),
                                       "bufferization.clone");
-    debugPrint("1");
     return op.getOperation();
   };
 }

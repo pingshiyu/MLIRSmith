@@ -85,9 +85,8 @@ inline VectorType random1DVectorType(MLIRContext *ctx) {
 
 // memref can be static ranked, dynamically ranked and unranked.
 inline MemRefType randomStaticShapedMemrefType(MLIRContext *ctx) {
-  debugPrint("1");
-  auto elemType = randomIntOrFloatType(ctx);debugPrint("2");
-  auto shape = shapePool[random(shapePool.size())];debugPrint("1");
+  auto elemType = randomIntOrFloatType(ctx);
+  auto shape = shapePool[random(shapePool.size())];
   return MemRefType::get(shape, elemType);
 }
 
@@ -223,26 +222,19 @@ inline Type randomNonTensorType(MLIRContext *ctx) {
 }
 
 inline FunctionType randomFunctionType(MLIRContext *ctx) {
-  debugPrint("r1");
   int func_arg_num = random(func_arg_ub);
   int func_ret_num = random(func_ret_ub);
-  debugPrint("r2");
-  if (ctx){
-    debugPrint("ctx");
-  }
   SmallVector<Type> argTypes;
   SmallVector<Type> retTypes;
   for (int i = 0; i < func_arg_num; ++i) {
     argTypes.push_back(randomType(ctx));
   }
-  debugPrint("r3");
 
   for (int i = 0; i < func_ret_num; ++i) {
     retTypes.push_back(randomType(ctx));
-  }  debugPrint("r4");
-
+  }
   auto funcType =
-      FunctionType::get(ctx, TypeRange(argTypes), TypeRange(retTypes));  debugPrint("r5");
+      FunctionType::get(ctx, TypeRange(argTypes), TypeRange(retTypes));
 
   return funcType;
 }

@@ -117,6 +117,6 @@ int mlir::toy::printConfig() {
 std::unique_ptr<Pass> mlir::toy::createMLIRSmithPass() {
   //  initConfig();
   initType();
-  registerSPIRVGenerators();
+//  registerSPIRVGenerators();
   return std::make_unique<MLIRSmithPass>();
 }

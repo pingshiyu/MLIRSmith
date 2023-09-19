@@ -7,7 +7,7 @@
 void OpGeneration::apply(mlir::OpBuilder &builder, mlir::Location loc,
                          OpRegion &region) {
 
-  std::cout << "apply: " << region.pool.vectorPool.size() << std::endl;
+//  std::cout << "apply: " << region.pool.vectorPool.size() << std::endl;
   this->generator(builder, loc, region);
 }
 

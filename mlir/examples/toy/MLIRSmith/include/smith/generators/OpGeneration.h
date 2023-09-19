@@ -616,7 +616,7 @@ OpGen spirvYieldGenerator();
 // generator registration
 inline std::map<std::string, OpGen> operators = {
     {"func.func", OpGen("func.func", funcGenerator())},
-    {"func.call", OpGen("func.call", callGenerator())},
+    {"func.call", OpGen("func.call", callGenerator())}, //TODO
     {"linalg.matmul", OpGen("linalg.matmul", linalgMatMulGenerator())},
     {"linalg.generic", OpGen("linalg.generic", linalgGenericGenerator())},
     {"linalg.map", OpGen("linalg.map", linalgMapGenerator())},

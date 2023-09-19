@@ -58,8 +58,7 @@ std::vector<Operation *> RegionGen::apply(OpBuilder &builder, Location loc,
   int length = 0;
   std::vector<Operation *> operations;
   if (region->tmpl != nullptr) {
-    for (auto op : region->tmpl[region->parent_op].) {
-      debugPrint("wtf" + op.dump(4));
+    for (auto op : region->tmpl[region->parent_op]) {
       region->cur_child = op;
       std::string opName;
       if (op.is_string()) { // op has no region
@@ -67,7 +66,6 @@ std::vector<Operation *> RegionGen::apply(OpBuilder &builder, Location loc,
       } else if (op.is_object()) {
         opName = op.items().begin().key();
       }
-      debugPrint(opName);
       if (operators.find(opName) == operators.end()) {
         llvm::errs() << opName << " not found in supported operations";
         continue ;
@@ -77,7 +75,6 @@ std::vector<Operation *> RegionGen::apply(OpBuilder &builder, Location loc,
       if (operation) {
         operations.push_back(operation);
       }
-      debugPrint("end " + opName);
     }
   } else {
     while (true) {

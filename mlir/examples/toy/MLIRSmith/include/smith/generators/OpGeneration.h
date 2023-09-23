@@ -616,7 +616,7 @@ OpGen spirvYieldGenerator();
 // generator registration
 inline std::map<std::string, OpGen> operators = {
     {"func.func", OpGen("func.func", funcGenerator())},
-    {"func.call", OpGen("func.call", callGenerator())}, //TODO
+//    {"func.call", OpGen("func.call", callGenerator())}, //TODO
     {"linalg.matmul", OpGen("linalg.matmul", linalgMatMulGenerator())},
     {"linalg.generic", OpGen("linalg.generic", linalgGenericGenerator())},
     {"linalg.map", OpGen("linalg.map", linalgMapGenerator())},
@@ -829,7 +829,8 @@ struct OpGeneration {
 };
 
 inline std::set<std::string> opsForFunc = {
-    "func.call", "linalg.matmul", "linalg.generic", "linalg.map", "linalg.copy",
+//    "func.call",
+    "linalg.matmul", "linalg.generic", "linalg.map", "linalg.copy",
     "linalg.transpose", "linalg.broadcast", "linalg.reduce", "linalg.dot",
     "memref.alloca", "memref.alloca_scope", "memref.assume_alignment",
     "memref.alloc", "memref.atomic_rmw", "memref.cast", "memref.realloc",

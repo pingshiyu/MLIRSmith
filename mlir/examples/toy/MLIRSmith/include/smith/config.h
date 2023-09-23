@@ -138,8 +138,8 @@ inline Conf getConfigTemplate() {
   std::vector<OpConf> funcOpConfs;
   funcOpConfs.push_back(
       OpConf("func", "func", rand(priority_base), {"builtin.module"}));
-  funcOpConfs.push_back(
-      OpConf("func", "call", rand(priority_base), {"func.func"}));
+//  funcOpConfs.push_back(
+//      OpConf("func", "call", rand(priority_base), {"func.func"}));
 
   std::vector<OpConf> linalgOpConfs;
   linalgOpConfs.push_back(

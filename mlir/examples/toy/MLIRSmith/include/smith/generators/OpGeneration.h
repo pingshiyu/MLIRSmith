@@ -13,7 +13,6 @@ using namespace mlir;
 
 inline std::vector<arith::AtomicRMWKind> floatRmwKinds = {
     arith::AtomicRMWKind::addf, arith::AtomicRMWKind::assign,
-    arith::AtomicRMWKind::maxf, arith::AtomicRMWKind::minf,
     arith::AtomicRMWKind::mulf};
 
 inline std::vector<arith::AtomicRMWKind> intRmwKinds = {
@@ -179,10 +178,6 @@ OpGenerator divFGenerator();
 OpGenerator divSIGenerator();
 OpGenerator divUIGenerator();
 OpGenerator floorDivSIGenerator();
-OpGenerator maxFGenerator();
-OpGenerator maxUIGenerator();
-OpGenerator maxSIGenerator();
-OpGenerator minFGenerator();
 OpGenerator minUIGenerator();
 OpGenerator minSIGenerator();
 OpGenerator mulFGenerator();
@@ -256,7 +251,7 @@ OpGenerator affineMinGenerator();
 OpGenerator affineMaxGenerator();
 OpGenerator affineParallelGenerator(); // error: 'affine.parallel' op a
 // reduction must be specified for each output
-OpGenerator affinePrefetchGenerator();
+// OpGenerator affinePrefetchGenerator();
 OpGenerator affineVectorLoadGenerator();
 OpGenerator affineVectorStoreGenerator();
 // OpGenerator affineDMAStartGenerator();
@@ -616,7 +611,7 @@ OpGen spirvYieldGenerator();
 // generator registration
 inline std::map<std::string, OpGen> operators = {
     {"func.func", OpGen("func.func", funcGenerator())},
-//    {"func.call", OpGen("func.call", callGenerator())}, //TODO
+    //    {"func.call", OpGen("func.call", callGenerator())}, //TODO
     {"linalg.matmul", OpGen("linalg.matmul", linalgMatMulGenerator())},
     {"linalg.generic", OpGen("linalg.generic", linalgGenericGenerator())},
     {"linalg.map", OpGen("linalg.map", linalgMapGenerator())},
@@ -650,10 +645,6 @@ inline std::map<std::string, OpGen> operators = {
     {"arith.divsi", OpGen("arith.divsi", divSIGenerator())},
     {"arith.divui", OpGen("arith.divui", divUIGenerator())},
     {"arith.floordivsi", OpGen("arith.floordivsi", floorDivSIGenerator())},
-    {"arith.maxf", OpGen("arith.maxf", maxFGenerator())},
-    {"arith.maxsi", OpGen("arith.maxsi", maxSIGenerator())},
-    {"arith.maxui", OpGen("arith.maxui", maxUIGenerator())},
-    {"arith.minf", OpGen("arith.minf", minFGenerator())},
     {"arith.minsi", OpGen("arith.minsi", minSIGenerator())},
     {"arith.minui", OpGen("arith.minui", minUIGenerator())},
     {"arith.mulf", OpGen("arith.mulf", mulFGenerator())},
@@ -829,7 +820,7 @@ struct OpGeneration {
 };
 
 inline std::set<std::string> opsForFunc = {
-//    "func.call",
+    //    "func.call",
     "linalg.matmul", "linalg.generic", "linalg.map", "linalg.copy",
     "linalg.transpose", "linalg.broadcast", "linalg.reduce", "linalg.dot",
     "memref.alloca", "memref.alloca_scope", "memref.assume_alignment",
@@ -837,29 +828,28 @@ inline std::set<std::string> opsForFunc = {
     "memref.tensor_store", "memref.store", "memref.load", "memref.copy",
     "arith.addf", "arith.addi", "arith.andi", "arith.cmpf", "arith.cmpi",
     "arith.ceildivsi", "arith.constant", "arith.divf", "arith.divsi",
-    "arith.divui", "arith.floordivsi", "arith.maxf", "arith.maxsi",
-    "arith.maxui", "arith.minf", "arith.minsi", "arith.minui", "arith.mulf",
-    "arith.muli", "arith.negf", "arith.ori", "arith.remf", "arith.remsi",
-    "arith.remui", "arith.shli", "arith.shrsi", "arith.shrui", "arith.subf",
-    "arith.subi", "arith.xori", "math.absf", "math.absi", "math.atan",
-    "math.atan2", "math.ceil", "math.copySign", "math.cos", "math.ctlz",
-    "math.cttz", "math.ctpop", "math.exp", "math.exp2", "math.expm1",
-    "math.floor", "math.fma", "math.ipowi", "math.log", "math.log10",
-    "math.log1p", "math.log2", "math.powf", "math.rsqrt", "math.sqrt",
-    "math.tan", "math.tanh", "math.roundeven", "math.round", "math.trunc",
-    "math.fpowi", "scf.if", "scf.execute_region", "scf.index_switch",
-    "scf.while", "scf.parallel", "affine.apply", "affine.for", "affine.if",
-    "affine.load", "affine.store", "affine.min", "affine.max",
-    "affine.parallel", "affine.vector_store", "affine.vector_load",
-    "vector.bitcast", "vector.broadcast", "vector.contract",
-    "vector.compress_store", "vector.create_mask", "vector.extract",
-    "vector.extract_strided_slice", "vector.fma", "vector.flat_transpose",
-    "vector.insert_element", "vector.insert", "vector.insert_strided_slice",
-    "vector.load", "vector.masked_load", "vector.matrix_multiply",
-    "vector.multi_reduction", "vector.outer_product", "vector.print",
-    "vector.reduction", "vector.scan", "vector.scatter", "vector.shuffle",
-    "vector.splat", "vector.transpose", "vector.gather", "vector.mask",
-    "vector.transfer_read", "vector.transfer_write",
+    "arith.divui", "arith.floordivsi", "arith.maxf", "arith.minf",
+    "arith.minsi", "arith.minui", "arith.mulf", "arith.muli", "arith.negf",
+    "arith.ori", "arith.remf", "arith.remsi", "arith.remui", "arith.shli",
+    "arith.shrsi", "arith.shrui", "arith.subf", "arith.subi", "arith.xori",
+    "math.absf", "math.absi", "math.atan", "math.atan2", "math.ceil",
+    "math.copySign", "math.cos", "math.ctlz", "math.cttz", "math.ctpop",
+    "math.exp", "math.exp2", "math.expm1", "math.floor", "math.fma",
+    "math.ipowi", "math.log", "math.log10", "math.log1p", "math.log2",
+    "math.powf", "math.rsqrt", "math.sqrt", "math.tan", "math.tanh",
+    "math.roundeven", "math.round", "math.trunc", "math.fpowi", "scf.if",
+    "scf.execute_region", "scf.index_switch", "scf.while", "scf.parallel",
+    "affine.apply", "affine.for", "affine.if", "affine.load", "affine.store",
+    "affine.min", "affine.max", "affine.parallel", "affine.vector_store",
+    "affine.vector_load", "vector.bitcast", "vector.broadcast",
+    "vector.contract", "vector.compress_store", "vector.create_mask",
+    "vector.extract", "vector.extract_strided_slice", "vector.fma",
+    "vector.flat_transpose", "vector.insert_element", "vector.insert",
+    "vector.insert_strided_slice", "vector.load", "vector.masked_load",
+    "vector.matrix_multiply", "vector.multi_reduction", "vector.outer_product",
+    "vector.print", "vector.reduction", "vector.scan", "vector.scatter",
+    "vector.shuffle", "vector.splat", "vector.transpose", "vector.gather",
+    "vector.mask", "vector.transfer_read", "vector.transfer_write",
     "vector.warp_execute_on_lane0", "tensor.cast", "tensor.collapse_shape",
     "tensor.dim", "tensor.empty", "tensor.expand_shape", "tensor.extract",
     "tensor.insert_slice", "tensor.extract_slice", "tensor.from_elements",
@@ -878,7 +868,6 @@ inline std::set<std::string> opsForFunc = {
 inline std::set<std::string> intOpsForGenericAtomicRMW = {
     "arith.addi",     "arith.andi",  "arith.cmpi",  "arith.ceildivsi",
     "arith.constant", "arith.divsi", "arith.divui", "arith.floordivsi",
-    "arith.maxsi",    "arith.maxui", "arith.minsi", "arith.minui",
     "arith.muli",     "arith.ori",   "arith.remsi", "arith.remui",
     "arith.shli",     "arith.shrsi", "arith.shrui", "arith.subi",
     "arith.xori",     "math.absi",   "math.ipowi",  "math.log",

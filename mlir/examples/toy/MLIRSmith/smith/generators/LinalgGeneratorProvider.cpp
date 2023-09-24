@@ -11,8 +11,6 @@ std::vector<OpGeneration> arithOperatorsF_wa = {
     OpGeneration("arith.addF", addFGenerator()),
     OpGeneration("arith.cmpF", cmpFGenerator()),
     OpGeneration("arith.divF", divFGenerator()),
-    OpGeneration("arith.maxF", maxFGenerator()),
-    OpGeneration("arith.minF", minFGenerator()),
     OpGeneration("arith.mulF", mulFGenerator()),
     OpGeneration("arith.negF", negFGenerator()),
     OpGeneration("arith.remF", remFGenerator()),
@@ -29,8 +27,6 @@ std::vector<OpGeneration> arithOperatorsI_wa = {
     OpGeneration("arith.divSI", divSIGenerator()),
     OpGeneration("arith.divSI", divUIGenerator()),
     OpGeneration("arith.floorDivSI", floorDivSIGenerator()),
-    OpGeneration("arith.maxUI", maxUIGenerator()),
-    OpGeneration("arith.maxSI", maxSIGenerator()),
     OpGeneration("arith.minUI", minUIGenerator()),
     OpGeneration("arith.minSI", minSIGenerator()),
     OpGeneration("arith.mulI", mulIGenerator()),
@@ -198,7 +194,6 @@ OpGenerator linalgBroadCastGenerator() {
     }
     auto operand = sampleTypedValueFrom(inputCandidates, "linalg.broadcast");
     auto srcShapeTy = operand.type.dyn_cast<ShapedType>();
-    std::cout << srcShapeTy.getRank() << ": src\n";
     SmallVector<int64_t> initShape(srcShapeTy.getShape());
     initShape.push_back(dimPool[UR(dimPool.size())]);
 
@@ -212,7 +207,6 @@ OpGenerator linalgBroadCastGenerator() {
       initTy = RankedTensorType::get(
           initShape, operand.type.dyn_cast<ShapedType>().getElementType());
     }
-    std::cout << initTy.dyn_cast<ShapedType>().getRank() << ": dest\n";
     auto initCandidates = region.pool.searchCandidatesFrom(
         {PoolType::StaticShapedTensor, PoolType::DynamicShapedTensor,
          PoolType::StaticShapedMemref, PoolType::DynamicShapedMemref},

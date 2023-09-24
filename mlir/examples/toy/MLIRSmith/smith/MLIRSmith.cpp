@@ -114,9 +114,55 @@ int mlir::toy::printConfig() {
   return 0;
 }
 
+void init(){
+  initType();
+  registerSPIRVGenerators();
+}
+
+class MLIRSmithImpl {
+public:
+  MLIRSmithImpl(mlir::MLIRContext &context) : builder(&context) {}
+
+  /// Public API: convert the AST for a Toy module (source file) to an MLIR
+  /// Module operation.
+  mlir::ModuleOp smith() {
+    // We create an empty MLIR module and codegen functions one at a time and
+    // add them to the module.
+    init();
+    theModule = mlir::ModuleOp::create(builder.getUnknownLoc());
+    auto point = builder.saveInsertionPoint();
+    builder.setInsertionPointToStart(&theModule.getBodyRegion().front());
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+
+    /* using nano-second instead of seconds */
+    srand((time_t)ts.tv_nsec);
+
+    OpRegion region("builtin.module", 0);
+    std::set<std::string> opsForModule = {"func.func"};
+    auto regionGen = RegionGen(&region, {OpNameFilter(opsForModule)});
+    regionGen.apply(builder, builder.getUnknownLoc(), func_num);
+
+    builder.restoreInsertionPoint(point);
+    return theModule;
+  }
+
+private:
+  /// A "module" matches a Toy source file: containing a list of functions.
+  mlir::ModuleOp theModule;
+
+  /// The builder is a helper class to create IR inside a function. The builder
+  /// is stateful, in particular it keeps an "insertion point": this is where
+  /// the next operations will be introduced.
+  mlir::OpBuilder builder;
+};
+
+mlir::OwningOpRef<mlir::ModuleOp> mlirSmith(mlir::MLIRContext &context) {
+  return MLIRSmithImpl(context).smith();
+}
+
 std::unique_ptr<Pass> mlir::toy::createMLIRSmithPass() {
   //  initConfig();
-  initType();
-//  registerSPIRVGenerators();
+  init();
   return std::make_unique<MLIRSmithPass>();
 }

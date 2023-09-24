@@ -14,6 +14,7 @@
 #include "smith/ExpSetting.h"
 #include "smith/TmplInstantiation.h"
 #include "smith/config.h"
+#include "smith/MLIRSmith.h"
 #include "smith/generators/OpGeneration.h"
 #include "toy/Dialect.h"
 #include "toy/Passes.h"
@@ -133,6 +134,15 @@ int loadMLIR(llvm::SourceMgr &sourceMgr, mlir::MLIRContext &context,
   return 0;
 }
 
+int gen(mlir::MLIRContext &context) {
+  auto module = mlirSmith(context);
+  if (!module) {
+    return 1;
+  }
+  module->dump();
+  return 0;
+}
+
 int instantiateTmpl(mlir::MLIRContext &context) {
 
   std::cout << "Instantiating template: " + inputFilename << std::endl;
@@ -154,7 +164,7 @@ int instantiateTmpl(mlir::MLIRContext &context) {
 
 int dumpMLIR() {
   if (configFileName.empty()) {
-    std::cout << "No custum configuration" << std::endl;
+//    std::cout << "No custum configuration" << std::endl;
     is_default_config = false;
   }
   initConfig(configFileName);
@@ -205,6 +215,10 @@ int dumpMLIR() {
 
   if (emitAction == Action::TmplInstantiation) {
     return instantiateTmpl(context);
+  }
+
+  if (emitAction == Action::MLIRSmith) {
+    return gen(context);
   }
 
   mlir::OwningOpRef<mlir::ModuleOp> module;
@@ -284,7 +298,7 @@ int main(int argc, char **argv) {
   mlir::registerPassManagerCLOptions();
 
   cl::ParseCommandLineOptions(argc, argv, "toy compiler\n");
-//  llvm::InitLLVM(argc, argv);
+  llvm::InitLLVM(argc, argv);
 
   switch (emitAction) {
   case Action::DumpConfig:

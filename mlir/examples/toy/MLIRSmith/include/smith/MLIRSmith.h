@@ -13,4 +13,6 @@
 
 using namespace mlir;
 
+mlir::OwningOpRef<mlir::ModuleOp> mlirSmith(mlir::MLIRContext &context);
+
 #endif

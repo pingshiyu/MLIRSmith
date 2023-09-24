@@ -301,17 +301,10 @@ OpGenerator affineParallelGenerator() {
       parent.pool.addTypeValue(tVal, "res(affine.parallel)");
     }
     auto point = builder.saveInsertionPoint();
-    auto &loopBody = op.getLoopBody();
-    auto &block = loopBody.front();
-    builder.setInsertionPointToStart(&block);
+    builder.setInsertionPointToStart(op.getBody());
     {
       OpRegion region("affine.parallel", parent.depth + 1,  parent.cur_child);
       region.pool.merge(parent.pool);
-      auto args = loopBody.getArguments();
-      for (uint i = 0; i < args.size(); ++i) {
-        region.pool.addIndex(TypeValue(builder.getIndexType(), args[i]),
-                             "arg(affine.parallel)");
-      }
       auto opFilter = OpNameFilter(opsForAffineParallel);
       RegionGen regionGen(&region, {opFilter});
       regionGen.apply(builder, loc, 0);
@@ -338,25 +331,25 @@ OpGenerator affineParallelGenerator() {
   };
 }
 
-OpGenerator affinePrefetchGenerator() {
-  return [](OpBuilder &builder, Location loc, OpRegion &parent) {
-    auto memCandidates = parent.pool.getCandidatesFromStaticShapedMemref(
-        builder, loc, randomStaticShapedMemrefType(builder.getContext()));
-    auto memref = sampleTypedValueFrom(memCandidates, "affine.prefetch");
-    auto shapedType = memref.type.dyn_cast<ShapedType>();
-    auto shape = shapedType.getShape();
-    SmallVector<Value> indices;
-    //    auto dim = shape.size();
-    //    for (uint32_t i = 0; i < dim; ++i) {
-    //      int size = parent.pool.constantIndices.size();
-    //      indices.push_back(parent.pool.constantIndices[UR(size)]);
-    //    }
-    // if there is no map, no need to add indices..
-    auto op = builder.create<AffinePrefetchOp>(loc, memref.val, indices, UR(2),
-                                               UR(4), UR(2));
-    return op.getOperation();
-  };
-}
+//OpGenerator affinePrefetchGenerator() {
+//  return [](OpBuilder &builder, Location loc, OpRegion &parent) {
+//    auto memCandidates = parent.pool.getCandidatesFromStaticShapedMemref(
+//        builder, loc, randomStaticShapedMemrefType(builder.getContext()));
+//    auto memref = sampleTypedValueFrom(memCandidates, "affine.prefetch");
+//    auto shapedType = memref.type.dyn_cast<ShapedType>();
+//    auto shape = shapedType.getShape();
+//    SmallVector<Value> indices;
+//    //    auto dim = shape.size();
+//    //    for (uint32_t i = 0; i < dim; ++i) {
+//    //      int size = parent.pool.constantIndices.size();
+//    //      indices.push_back(parent.pool.constantIndices[UR(size)]);
+//    //    }
+//    // if there is no map, no need to add indices..
+//    auto op = builder.create<AffinePrefetchOp>(loc, memref.val, indices, UR(2),
+//                                               UR(4), UR(2));
+//    return op.getOperation();
+//  };
+//}
 
 OpGenerator affineVectorLoadGenerator() {
   return [](OpBuilder &builder, Location loc, OpRegion &parent) {

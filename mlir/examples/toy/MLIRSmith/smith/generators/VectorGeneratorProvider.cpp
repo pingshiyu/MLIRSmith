@@ -368,12 +368,12 @@ OpGenerator vectorExtractGenerator() {
     auto vectorOperand =
         sampleTypedValueFrom(vectorCandidates, "vector.extract");
     auto vectorTy = vectorOperand.type.dyn_cast<VectorType>();
-    SmallVector<Value> indices;
+    SmallVector<int64_t> indices;
     auto indicesSize =
         max(1, UR(vectorTy.getRank())); // at least extract 1 dim.
     for (int i = 0; i < indicesSize; ++i) {
       auto idx = UR(vectorTy.getDimSize(i));
-      indices.push_back(region.pool.getConstantIndex(builder, loc, idx));
+      indices.push_back(idx);
     }
     auto res =
         builder.create<vector::ExtractOp>(loc, vectorOperand.val, indices);

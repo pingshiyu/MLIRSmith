@@ -204,14 +204,6 @@ inline Conf getConfigTemplate() {
   arithOpConfs.push_back(
       OpConf("arith", "floordivsi", rand(priority_base), {"func.func"}));
   arithOpConfs.push_back(
-      OpConf("arith", "maxf", rand(priority_base), {"func.func"}));
-  arithOpConfs.push_back(
-      OpConf("arith", "maxsi", rand(priority_base), {"func.func"}));
-  arithOpConfs.push_back(
-      OpConf("arith", "maxui", rand(priority_base), {"func.func"}));
-  arithOpConfs.push_back(
-      OpConf("arith", "minf", rand(priority_base), {"func.func"}));
-  arithOpConfs.push_back(
       OpConf("arith", "minsi", rand(priority_base), {"func.func"}));
   arithOpConfs.push_back(
       OpConf("arith", "minui", rand(priority_base), {"func.func"}));

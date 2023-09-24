@@ -14,7 +14,7 @@
 #include "smith/TypeGeneration.h"
 using json = nlohmann::json;
 
-mlir::OwningOpRef<mlir::ModuleOp> tmplInstantiation(m lir::MLIRContext &context,
+mlir::OwningOpRef<mlir::ModuleOp> tmplInstantiation(mlir::MLIRContext &context,
                                           json tmpl);
 
 #endif // MLIR_FUZZ_TMPLINSTANTIATION_H

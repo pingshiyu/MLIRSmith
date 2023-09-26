@@ -6,7 +6,7 @@ set(LLVM_LINK_COMPONENTS
   Support
   )
 
-add_toy_chapter(mlirsmith
+add_mlir_tool(mlirsmith
   toyc.cpp
   mlir/Dialect.cpp
   smith/MLIRSmith.cpp

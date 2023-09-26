@@ -251,7 +251,7 @@ tools.extend(
         ToolSubst("llvm-debuginfod", unresolved="ignore"),
         ToolSubst("Kaleidoscope-Ch3", unresolved="ignore"),
         ToolSubst("Kaleidoscope-Ch4", unresolved="ignore"),
-        ToolSubst("Kaleidoscope-MLIRSmith", unresolved="ignore"),
+        ToolSubst("Kaleidoscope-mlirsmith", unresolved="ignore"),
         ToolSubst("Kaleidoscope-Ch6", unresolved="ignore"),
         ToolSubst("Kaleidoscope-Ch7", unresolved="ignore"),
         ToolSubst("Kaleidoscope-Ch8", unresolved="ignore"),

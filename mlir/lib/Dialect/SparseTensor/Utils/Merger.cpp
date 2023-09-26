@@ -994,7 +994,7 @@ LatSetId Merger::buildLattices(ExprId e, LoopId i) {
   case TensorExp::Kind::kCIm:
   case TensorExp::Kind::kCRe:
   case TensorExp::Kind::kBitCast:
-    // A zero preserving operation (viz. f(0) = 0, [Bik96,MLIRSmith]) maps the
+    // A zero preserving operation (viz. f(0) = 0, [Bik96,mlirsmith]) maps the
     // lattice set of the operand through the operator into a new set.
     //
     //  -y|!y | y |

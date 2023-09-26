@@ -8,14 +8,6 @@
 
 using namespace mlir;
 
-//
-// void createFillMemrefFunc(OpBuilder &builder, Location loc, MemRefType) {
-//  auto funcName = "fillMemref";
-//  SmallVector<Type> argTypes;
-//  SmallVector<Type> retTypes;
-//  auto funcTy = FunctionType::get(builder.getContext(),  );
-//}
-
 void consumeEachTensor(OpBuilder &builder, Location loc, TypedValuePool &p) {
   for (auto tval : p.staticShapedTensorPool) {
     auto tensorType = tval.type.dyn_cast<RankedTensorType>();

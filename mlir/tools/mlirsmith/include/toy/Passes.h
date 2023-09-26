@@ -22,7 +22,7 @@ namespace toy {
 // Count coverages
 std::unique_ptr<mlir::Pass> createOpPrinterPass();
 
-// Entrance of MLIRSmith.
+// Entrance of mlirsmith.
 std::unique_ptr<mlir::Pass> createMLIRSmithPass();
 
 int printConfig();

@@ -7,6 +7,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "ByteCodeEmitter.h"
+#include "ByteCodeGenError.h"
 #include "Context.h"
 #include "Floating.h"
 #include "Opcode.h"
@@ -17,9 +18,6 @@
 
 using namespace clang;
 using namespace clang::interp;
-
-using APSInt = llvm::APSInt;
-using Error = llvm::Error;
 
 Expected<Function *>
 ByteCodeEmitter::compileFunc(const FunctionDecl *FuncDecl) {
@@ -94,8 +92,12 @@ ByteCodeEmitter::compileFunc(const FunctionDecl *FuncDecl) {
   assert(Func);
   // For not-yet-defined functions, we only create a Function instance and
   // compile their body later.
-  if (!FuncDecl->isDefined())
+  if (!FuncDecl->isDefined()) {
+    Func->setDefined(false);
     return Func;
+  }
+
+  Func->setDefined(true);
 
   // Lambda static invokers are a special case that we emit custom code for.
   bool IsEligibleForCompilation = false;

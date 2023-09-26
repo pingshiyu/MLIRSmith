@@ -8,51 +8,117 @@
 
 void registerSPIRVGenerators() {
   std::vector<OpGen> spirvGens = {
-      spirvBitCountGenerator(), spirvBitReverseGenerator(),
-      spirvFNegateGenerator(), spirvIsInfGenerator(), spirvIsNanGenerator(),
-      spirvLogicalNotGenerator(), spirvNotGenerator(),
-      spirvBitFieldInsertGenerator(), spirvBitFieldSExtractGenerator(),
-      spirvBitFieldUExtractGenerator(), spirvBitwiseAndGenerator(),
-      spirvBitwiseOrGenerator(), spirvBitwiseXorGenerator(),
-      spirvCLCeilGenerator(), spirvCLCosGenerator(), spirvCLErfGenerator(),
-      spirvCLExpGenerator(), spirvCLFAbsGenerator(), spirvCLFloorGenerator(),
-      spirvCLLogGenerator(), spirvCLRintGenerator(), spirvCLRoundGenerator(),
-      spirvCLRsqrtGenerator(), spirvCLSinGenerator(), spirvCLSqrtGenerator(),
-      spirvCLTanhGenerator(), spirvBitwiseOrGenerator(),
-      spirvBitwiseXorGenerator(), spirvCLCeilGenerator(), spirvCLCosGenerator(),
-      spirvCLErfGenerator(), spirvCLExpGenerator(), spirvCLFAbsGenerator(),
-      spirvCLFloorGenerator(), spirvCLLogGenerator(), spirvCLRintGenerator(),
-      spirvCLRoundGenerator(), spirvCLRsqrtGenerator(), spirvCLSinGenerator(),
-      spirvCLSqrtGenerator(), spirvCLTanhGenerator(), spirvFOrdEqualGenerator(),
-      spirvFOrdGreaterThanEqualGenerator(), spirvFOrdGreaterThanGenerator(),
-      spirvFOrdLessThanEqualGenerator(), spirvFOrdLessThanGenerator(),
-      spirvFOrdNotEqualGenerator(), spirvFUnordEqualGenerator(),
-      spirvFUnordGreaterThanEqualGenerator(), spirvFUnordGreaterThanGenerator(),
-      spirvFUnordLessThanEqualGenerator(), spirvFUnordLessThanGenerator(),
-      spirvFUnordNotEqualGenerator(), spirvIEqualGenerator(),
-      spirvINotEqualGenerator(), spirvLogicalAndGenerator(),
-      spirvLogicalOrGenerator(), spirvLogicalEqualGenerator(),
-      spirvLogicalNotEqualGenerator(), spirvSGreaterThanEqualGenerator(),
-      spirvSGreaterThanGenerator(), spirvSLessThanEqualGenerator(),
-      spirvSLessThanGenerator(), spirvUGreaterThanEqualGenerator(),
-      spirvUGreaterThanGenerator(), spirvULessThanEqualGenerator(),
-      spirvULessThanGenerator(), spirvUnorderedGenerator(),
-      spirvGLAcosGenerator(), spirvGLAsinGenerator(), spirvGLAtanGenerator(),
-      spirvGLCeilGenerator(), spirvGLCosGenerator(), spirvGLCoshGenerator(),
-      spirvGLExpGenerator(), spirvGLFAbsGenerator(), spirvGLFSignGenerator(),
-      spirvGLFloorGenerator(), spirvGLInverseSqrtGenerator(),
-      spirvGLLogGenerator(), spirvGLRoundEvenGenerator(),
-      spirvGLRoundGenerator(), spirvGLSinGenerator(), spirvGLSinhGenerator(),
-      spirvGLSqrtGenerator(), spirvGLTanGenerator(), spirvGLTanhGenerator(),
-      spirvGLFClampGenerator(), spirvGLFMaxGenerator(), spirvGLFMinGenerator(),
+      spirvBitCountGenerator(),
+      spirvBitReverseGenerator(),
+      spirvFNegateGenerator(),
+      spirvIsInfGenerator(),
+      spirvIsNanGenerator(),
+      spirvLogicalNotGenerator(),
+      spirvNotGenerator(),
+      spirvBitFieldInsertGenerator(),
+      spirvBitFieldSExtractGenerator(),
+      spirvBitFieldUExtractGenerator(),
+      spirvBitwiseAndGenerator(),
+      spirvBitwiseOrGenerator(),
+      spirvBitwiseXorGenerator(),
+      spirvCLCeilGenerator(),
+      spirvCLCosGenerator(),
+      spirvCLErfGenerator(),
+      spirvCLExpGenerator(),
+      spirvCLFAbsGenerator(),
+      spirvCLFloorGenerator(),
+      spirvCLLogGenerator(),
+      spirvCLRintGenerator(),
+      spirvCLRoundGenerator(),
+      spirvCLRsqrtGenerator(),
+      spirvCLSinGenerator(),
+      spirvCLSqrtGenerator(),
+      spirvCLTanhGenerator(),
+      spirvBitwiseOrGenerator(),
+      spirvBitwiseXorGenerator(),
+      spirvCLCeilGenerator(),
+      spirvCLCosGenerator(),
+      spirvCLErfGenerator(),
+      spirvCLExpGenerator(),
+      spirvCLFAbsGenerator(),
+      spirvCLFloorGenerator(),
+      spirvCLLogGenerator(),
+      spirvCLRintGenerator(),
+      spirvCLRoundGenerator(),
+      spirvCLRsqrtGenerator(),
+      spirvCLSinGenerator(),
+      spirvCLSqrtGenerator(),
+      spirvCLTanhGenerator(),
+      spirvFOrdEqualGenerator(),
+      spirvFOrdGreaterThanEqualGenerator(),
+      spirvFOrdGreaterThanGenerator(),
+      spirvFOrdLessThanEqualGenerator(),
+      spirvFOrdLessThanGenerator(),
+      spirvFOrdNotEqualGenerator(),
+      spirvFUnordEqualGenerator(),
+      spirvFUnordGreaterThanEqualGenerator(),
+      spirvFUnordGreaterThanGenerator(),
+      spirvFUnordLessThanEqualGenerator(),
+      spirvFUnordLessThanGenerator(),
+      spirvFUnordNotEqualGenerator(),
+      spirvIEqualGenerator(),
+      spirvINotEqualGenerator(),
+      spirvLogicalAndGenerator(),
+      spirvLogicalOrGenerator(),
+      spirvLogicalEqualGenerator(),
+      spirvLogicalNotEqualGenerator(),
+      spirvSGreaterThanEqualGenerator(),
+      spirvSGreaterThanGenerator(),
+      spirvSLessThanEqualGenerator(),
+      spirvSLessThanGenerator(),
+      spirvUGreaterThanEqualGenerator(),
+      spirvUGreaterThanGenerator(),
+      spirvULessThanEqualGenerator(),
+      spirvULessThanGenerator(),
+      spirvUnorderedGenerator(),
+      spirvGLAcosGenerator(),
+      spirvGLAsinGenerator(),
+      spirvGLAtanGenerator(),
+      spirvGLCeilGenerator(),
+      spirvGLCosGenerator(),
+      spirvGLCoshGenerator(),
+      spirvGLExpGenerator(),
+      spirvGLFAbsGenerator(),
+      spirvGLFSignGenerator(),
+      spirvGLFloorGenerator(),
+      spirvGLInverseSqrtGenerator(),
+      spirvGLLogGenerator(),
+      spirvGLRoundEvenGenerator(),
+      spirvGLRoundGenerator(),
+      spirvGLSinGenerator(),
+      spirvGLSinhGenerator(),
+      spirvGLSqrtGenerator(),
+      spirvGLTanGenerator(),
+      spirvGLTanhGenerator(),
+      spirvGLFClampGenerator(),
+      spirvGLFMaxGenerator(),
+      spirvGLFMinGenerator(),
       spirvGLFMixGenerator(), // spirvGLFindUMsbGenerator(), //TODO
-      spirvGLFmaGenerator(), spirvGLLdexpGenerator(), spirvGLPowGenerator(),
-      spirvGLSAbsGenerator(), spirvGLSClampGenerator(), spirvGLSMaxGenerator(),
-      spirvGLSMinGenerator(), spirvGLSSignGenerator(), spirvGLUClampGenerator(),
-      spirvGLUMaxGenerator(), spirvGLUMinGenerator(), spirvCLFMaxGenerator(),
-      spirvCLFMinGenerator(), spirvCLFmaGenerator(), spirvCLPowGenerator(),
-      spirvCLSAbsGenerator(), spirvCLSMaxGenerator(), spirvCLSMinGenerator(),
-      spirvCLUMaxGenerator(), spirvCLUMinGenerator()};
+      spirvGLFmaGenerator(),
+      spirvGLLdexpGenerator(),
+      spirvGLPowGenerator(),
+      spirvGLSAbsGenerator(),
+      spirvGLSClampGenerator(),
+      spirvGLSMaxGenerator(),
+      spirvGLSMinGenerator(),
+      spirvGLSSignGenerator(),
+      spirvGLUClampGenerator(),
+      spirvGLUMaxGenerator(),
+      spirvGLUMinGenerator(),
+      spirvCLFMaxGenerator(),
+      spirvCLFMinGenerator(),
+      spirvCLFmaGenerator(),
+      spirvCLPowGenerator(),
+      spirvCLSAbsGenerator(),
+      spirvCLSMaxGenerator(),
+      spirvCLSMinGenerator(),
+      spirvCLUMaxGenerator(),
+      spirvCLUMinGenerator()};
 
   for (auto gen : spirvGens) {
     operators.insert(std::make_pair(gen.opName, gen));
@@ -125,10 +191,10 @@ OpGen getSPIRVIntUnaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     auto op = builder.create<T>(loc, operand.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -146,10 +212,10 @@ OpGen getSPIRVFloatUnaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateFloat(builder, loc, builder.getF32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     auto op = builder.create<T>(loc, operand.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -166,10 +232,10 @@ OpGen getSPIRVFloat16Or32UnaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateFloat(builder, loc, builder.getF32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     auto op = builder.create<T>(loc, operand.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -187,15 +253,15 @@ OpGen getSPIRVIntBinaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
 
     auto operand2Candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat},
         [&](TypeValue t) { return t.type == operand.val.getType(); });
     auto op = builder.create<T>(
-        loc, operand.val, sampleTypedValueFrom(operand2Candidates, opName).val);
+        loc, operand.val, sampleTypedValueFrom(operand2Candidates).val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -213,7 +279,7 @@ OpGen getSPIRVIntLogicalBinaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     Type resTy = builder.getI1Type();
     auto operandTy = operand.val.getType().template dyn_cast<VectorType>();
     if (operandTy) {
@@ -225,9 +291,9 @@ OpGen getSPIRVIntLogicalBinaryOpGenerator(std::string opName) {
         [&](TypeValue t) { return t.type == operand.val.getType(); });
     auto op =
         builder.create<T>(loc, resTy, operand.val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val);
+                          sampleTypedValueFrom(operand2Candidates).val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -245,15 +311,15 @@ OpGen getSPIRVFloatBinaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateFloat(builder, loc, builder.getF32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
 
     auto operand2Candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat},
         [&](TypeValue t) { return t.type == operand.val.getType(); });
     auto op = builder.create<T>(
-        loc, operand.val, sampleTypedValueFrom(operand2Candidates, opName).val);
+        loc, operand.val, sampleTypedValueFrom(operand2Candidates).val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -274,17 +340,17 @@ OpGen getSPIRVBitBinaryOpGenerator(std::string opName) {
       vecCandidates.push_back(region.pool.generateVector(
           builder, loc, VectorType::get({2}, builder.getI32Type())));
     }
-    auto operand1 = sampleTypedValueFrom(vecCandidates, opName);
+    auto operand1 = sampleTypedValueFrom(vecCandidates);
 
     auto operand2Candidates =
         region.pool.searchCandidatesFrom({PoolType::Vector}, [&](TypeValue t) {
           return t.type == operand1.val.getType();
         });
-    auto operand2 = sampleTypedValueFrom(operand2Candidates, opName);
+    auto operand2 = sampleTypedValueFrom(operand2Candidates);
 
     auto op = builder.create<T>(loc, operand1.val, operand2.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -301,10 +367,10 @@ OpGen getSPIRVBoolUnaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI1Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     auto op = builder.create<T>(loc, operand.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -321,10 +387,10 @@ OpGen getSPIRVFUnaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateFloat(builder, loc, builder.getF32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     auto op = builder.create<T>(loc, operand.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -341,10 +407,10 @@ OpGen getSPIRVIUnaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     auto op = builder.create<T>(loc, operand.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -366,7 +432,7 @@ OpGen spirvBitFieldExtractGenerator(std::string uOrS) {
       vecCandidates.push_back(region.pool.generateVector(
           builder, loc, VectorType::get({2}, builder.getI32Type())));
     }
-    auto operand1 = sampleTypedValueFrom(vecCandidates, opName);
+    auto operand1 = sampleTypedValueFrom(vecCandidates);
 
     auto intCandidates = region.pool.searchCandidatesFrom(
         {PoolType::IntOrFloat}, [](TypeValue t) {
@@ -378,12 +444,12 @@ OpGen spirvBitFieldExtractGenerator(std::string uOrS) {
       intCandidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
-    auto operand3 = sampleTypedValueFrom(intCandidates, opName);
-    auto operand4 = sampleTypedValueFrom(intCandidates, opName);
+    auto operand3 = sampleTypedValueFrom(intCandidates);
+    auto operand4 = sampleTypedValueFrom(intCandidates);
 
     auto op = builder.create<T>(loc, operand1.val, operand3.val, operand4.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -401,17 +467,17 @@ OpGen getSPIRVFloatTriOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateFloat(builder, loc, builder.getF32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
 
     auto operand2Candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat},
         [&](TypeValue t) { return t.type == operand.val.getType(); });
     auto op =
         builder.create<T>(loc, operand.val.getType(), operand.val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val);
+                          sampleTypedValueFrom(operand2Candidates).val,
+                          sampleTypedValueFrom(operand2Candidates).val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -429,17 +495,17 @@ OpGen getSPIRVIntTriOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateFloat(builder, loc, builder.getF32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
 
     auto operand2Candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat},
         [&](TypeValue t) { return t.type == operand.val.getType(); });
     auto op =
         builder.create<T>(loc, operand.val.getType(), operand.val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val,
-                          sampleTypedValueFrom(operand2Candidates, opName).val);
+                          sampleTypedValueFrom(operand2Candidates).val,
+                          sampleTypedValueFrom(operand2Candidates).val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -456,14 +522,14 @@ OpGen getSPIRVBoolBinaryOpGenerator(std::string opName) {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI1Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     auto operand2Candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat},
         [&](TypeValue t) { return t.type == operand.val.getType(); });
     auto op = builder.create<T>(
-        loc, operand.val, sampleTypedValueFrom(operand2Candidates, opName).val);
+        loc, operand.val, sampleTypedValueFrom(operand2Candidates).val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -488,12 +554,12 @@ OpGen spirvBitFieldInsertGenerator() {
       vecCandidates.push_back(region.pool.generateVector(
           builder, loc, VectorType::get({2}, builder.getI32Type())));
     }
-    auto operand1 = sampleTypedValueFrom(vecCandidates, opName);
+    auto operand1 = sampleTypedValueFrom(vecCandidates);
     auto operand2Candidates =
         region.pool.searchCandidatesFrom({PoolType::Vector}, [&](TypeValue t) {
           return t.type == operand1.val.getType();
         });
-    auto operand2 = sampleTypedValueFrom(operand2Candidates, opName);
+    auto operand2 = sampleTypedValueFrom(operand2Candidates);
 
     auto intCandidates = region.pool.searchCandidatesFrom(
         {PoolType::IntOrFloat}, [](TypeValue t) {
@@ -505,13 +571,13 @@ OpGen spirvBitFieldInsertGenerator() {
       intCandidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
-    auto operand3 = sampleTypedValueFrom(intCandidates, opName);
-    auto operand4 = sampleTypedValueFrom(intCandidates, opName);
+    auto operand3 = sampleTypedValueFrom(intCandidates);
+    auto operand4 = sampleTypedValueFrom(intCandidates);
 
     auto op = builder.create<spirv::BitFieldInsertOp>(
         loc, operand1.val, operand2.val, operand3.val, operand4.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -912,10 +978,10 @@ OpGen spirvGLFindUMsbGenerator() {
       candidates.push_back(
           region.pool.generateInteger(builder, loc, builder.getI32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    auto operand = sampleTypedValueFrom(candidates);
     auto op = builder.create<spirv::GLFindUMsbOp>(loc, operand.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -937,7 +1003,7 @@ OpGen spirvGLLdexpGenerator() {
       candidates1.push_back(
           region.pool.generateFloat(builder, loc, builder.getF32Type()));
     }
-    auto operand1 = sampleTypedValueFrom(candidates1, opName);
+    auto operand1 = sampleTypedValueFrom(candidates1);
     auto isVec = false;
     VectorType ty;
     if (operand1.val.getType().dyn_cast<VectorType>()) {
@@ -974,10 +1040,10 @@ OpGen spirvGLLdexpGenerator() {
             region.pool.generateInteger(builder, loc, builder.getI32Type()));
       }
     }
-    auto operand2 = sampleTypedValueFrom(candidates2, opName);
+    auto operand2 = sampleTypedValueFrom(candidates2);
     auto op = builder.create<spirv::GLLdexpOp>(loc, operand1.val, operand2.val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);
@@ -986,23 +1052,29 @@ OpGen spirvGLLdexpGenerator() {
 OpGen spirvGLPowGenerator() {
   auto opName = "spirv.GL.Pow";
   auto gen = [&](OpBuilder &builder, Location loc, OpRegion &region) {
+    debugPrint("1");
     auto candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat}, [](TypeValue t) {
           return isValidUnaryOperand<FloatType>(t, {16, 32}, {2, 3, 4, 8, 16});
         });
+    debugPrint("2");
     if (candidates.empty()) {
       candidates.push_back(
           region.pool.generateFloat(builder, loc, builder.getF32Type()));
     }
-    auto operand = sampleTypedValueFrom(candidates, opName);
+    debugPrint("1");
+    auto operand = sampleTypedValueFrom(candidates);
 
+    debugPrint("2");
     auto operand2Candidates = region.pool.searchCandidatesFrom(
         {PoolType::Vector, PoolType::IntOrFloat},
         [&](TypeValue t) { return t.type == operand.val.getType(); });
+    debugPrint("1");
     auto op = builder.create<spirv::GLPowOp>(
-        loc, operand.val, sampleTypedValueFrom(operand2Candidates, opName).val);
+        loc, operand.val, sampleTypedValueFrom(operand2Candidates).val);
     auto tval = TypeValue(op.getType(), op);
-    region.pool.addTypeValue(tval, opName);
+    debugPrint("2");
+    region.pool.addTypeValue(tval);
     return op.getOperation();
   };
   return OpGen(opName, gen);

@@ -124,14 +124,14 @@ OpGenerator cmpFGenerator() {
                                                operands[1].val);
     if (operands[0].type.dyn_cast<FloatType>()) {
       auto tVal = TypeValue(builder.getI1Type(), value);
-      typedValuePool.addIntOrFloat(tVal, "arith.cmpF");
+      typedValuePool.addIntOrFloat(tVal, "");
     } else if (operands[0].type.dyn_cast<RankedTensorType>()) {
       auto tVal =
           TypeValue(RankedTensorType::get(
                         operands[0].type.dyn_cast<ShapedType>().getShape(),
                         builder.getI1Type()),
                     value);
-      typedValuePool.addTypeValue(tVal, "arith.cmpF");
+      typedValuePool.addTypeValue(tVal);
     }
     return value.getOperation();
   };
@@ -152,14 +152,14 @@ OpGenerator cmpIGenerator() {
                                                operands[1].val);
     if (operands[0].type.dyn_cast<IntegerType>()) {
       auto tVal = TypeValue(builder.getI1Type(), value);
-      typedValuePool.addIntOrFloat(tVal, "arith.cmpI");
+      typedValuePool.addIntOrFloat(tVal,"");
     } else if (operands[0].type.dyn_cast<RankedTensorType>()) {
       auto tVal =
           TypeValue(RankedTensorType::get(
                         operands[0].type.dyn_cast<ShapedType>().getShape(),
                         builder.getI1Type()),
                     value);
-      typedValuePool.addTypeValue(tVal, "arith.cmpI");
+      typedValuePool.addTypeValue(tVal);
     }
     return value.getOperation();
   };

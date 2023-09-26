@@ -37,7 +37,7 @@ bool isTheSameShapedType(ShapedType typeA, ShapedType typeB);
 long long UR(long long mod);
 
 TypeValue sampleTypedValueFrom(std::vector<TypeValue> candidates,
-                               std::string opToBuild);
+                               std::string opToBuild="");
 
 std::vector<TypeValue>
 searchIntegerCandidatesFrom(const std::vector<TypeValue> pool);

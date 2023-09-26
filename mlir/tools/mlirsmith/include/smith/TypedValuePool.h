@@ -63,11 +63,10 @@ struct TypedValuePool {
         staticShapedMemrefPool(staticShapedMemrefPool),
         dynamicShapedMemrefPool(dynamicShapedMemrefPool),
         unrankedMemrefPool(unrankedMemrefPool),
-        unrankedTensorPool(unrankedTensorPool),
-        intOrFloatPool(intOrFloatPool), vectorPool(vectorPool),
-        indexPool(indexPool), constantIndices(constantIndices),
-        affineExprPool(affineExprPool), affineMapPool(affineMapPool),
-        integerSetPool(integerSetPool) {}
+        unrankedTensorPool(unrankedTensorPool), intOrFloatPool(intOrFloatPool),
+        vectorPool(vectorPool), indexPool(indexPool),
+        constantIndices(constantIndices), affineExprPool(affineExprPool),
+        affineMapPool(affineMapPool), integerSetPool(integerSetPool) {}
 
   void clearAll() {
     staticShapedTensorPool.clear();
@@ -98,8 +97,12 @@ struct TypedValuePool {
     dynamicShapedMemrefPool.insert(dynamicShapedMemrefPool.end(),
                                    pool.dynamicShapedMemrefPool.begin(),
                                    pool.dynamicShapedMemrefPool.end());
-    unrankedTensorPool.insert(unrankedTensorPool.begin(),pool.unrankedTensorPool.begin(), pool.unrankedTensorPool.end());
-    unrankedMemrefPool.insert(unrankedMemrefPool.begin(),pool.unrankedMemrefPool.begin(), pool.unrankedMemrefPool.end());
+    unrankedTensorPool.insert(unrankedTensorPool.begin(),
+                              pool.unrankedTensorPool.begin(),
+                              pool.unrankedTensorPool.end());
+    unrankedMemrefPool.insert(unrankedMemrefPool.begin(),
+                              pool.unrankedMemrefPool.begin(),
+                              pool.unrankedMemrefPool.end());
     intOrFloatPool.insert(intOrFloatPool.end(), pool.intOrFloatPool.begin(),
                           pool.intOrFloatPool.end());
     indexPool.insert(indexPool.end(), pool.indexPool.begin(),
@@ -116,7 +119,7 @@ struct TypedValuePool {
                           pool.integerSetPool.end());
   }
 
-  void addTypeValue(const TypeValue &typedValue, std::string op);
+  void addTypeValue(const TypeValue &typedValue, std::string op = "");
   void addIntOrFloat(const TypeValue &val, std::string op);
   void addElement(const TypeValue &element, std::string op);
   void addRankedMemref(const TypeValue &memref, std::string op);
@@ -148,8 +151,9 @@ struct TypedValuePool {
                                                  Location loc, Type t);
   std::vector<TypeValue> getCandidatesFromIndex(OpBuilder &builder,
                                                 Location loc);
-  std::vector<TypeValue> searchCandidatesFrom(std::vector<PoolType>,
-                                              TypeValueFilter typeValueFilter = emptyFilter());
+  std::vector<TypeValue>
+  searchCandidatesFrom(std::vector<PoolType>,
+                       TypeValueFilter typeValueFilter = emptyFilter());
 
   /* generate a new value corresponding to provided type, add the return value
    * to the pool */
@@ -174,7 +178,7 @@ struct TypedValuePool {
 
   // generate an empty memref, assume it is ranked.
   TypeValue generateRankedMemref(OpBuilder &builder, Location loc,
-                                       MemRefType type);
+                                 MemRefType type);
   TypeValue generateStaticShapedMemref(OpBuilder &builder, Location loc,
                                        MemRefType type);
 

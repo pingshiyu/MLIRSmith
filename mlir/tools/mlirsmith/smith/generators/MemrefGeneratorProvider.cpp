@@ -19,7 +19,7 @@ OpGenerator memrefLoadGenerator() {
       memCandidates.push_back(region.pool.generateRankedMemref(
           builder, loc, randomRankedMemrefType(builder.getContext())));
     }
-    auto typedAlloc = sampleTypedValueFrom(memCandidates, "memref.load");
+    auto typedAlloc = sampleTypedValueFrom(memCandidates);
     auto alloc = typedAlloc.val;
     auto t = typedAlloc.type.dyn_cast<ShapedType>();
     auto elemType = t.getElementType();

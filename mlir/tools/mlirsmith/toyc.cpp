@@ -165,15 +165,15 @@ int instantiateTmpl(mlir::MLIRContext &context) {
 int dumpMLIR() {
   if (configFileName.empty()) {
 //    std::cout << "No custum configuration" << std::endl;
-    is_default_config = false;
+    is_default_config = true;
   }
   initConfig(configFileName);
   mlir::DialectRegistry registry;
   mlir::func::registerAllExtensions(registry);
 
-  diverse = isDiverse;
-  //  std::cout << "d: " << diverse << std::endl;
-  diversity.import("cov.json");
+//  diverse = isDiverse;
+//  //  std::cout << "d: " << diverse << std::endl;
+//  diversity.import("cov.json");
   mlir::MLIRContext context(registry);
   // Load our Dialect in this MLIR Context.
   context.getOrLoadDialect<mlir::toy::ToyDialect>();
@@ -260,7 +260,7 @@ json createRegion(std::string opName, int depth) {
     region = opName;
     return region;
   }
-  auto ops = std::vector(opNests[opName].begin(), opNests[opName].end());
+  auto ops = std::vector<std::string>(opNests[opName].begin(), opNests[opName].end());
 
   std::vector<json> opSeq;
   for (int i = 0; i < UR(maxLength); ++i) {

@@ -69,33 +69,7 @@ searchShapedInputFrom(ShapedType type, const std::vector<TypeValue> &pool) {
 TypeValue sampleTypedValueFrom(std::vector<TypeValue> candidates,
                                std::string opToBuild) {
   assert(!candidates.empty());
-  if (diverse) {
-    if (diversity.opConnections.find(opToBuild) !=
-        diversity.opConnections.end()) {
-      std::vector<float> weights(candidates.size(), priority_base);
-      auto coveredConnections = diversity.opConnections[opToBuild];
-      for (size_t i = 0; i < candidates.size(); i++) {
-        auto tval = candidates[i];
-        if (!tval.val.getDefiningOp()) {
-          continue;
-        }
-        auto fromOpName =
-            tval.val.getDefiningOp()->getName().getStringRef().str();
-        if (coveredConnections.find(fromOpName) == coveredConnections.end()) {
-          weights[i] += 9 * priority_base;
-        }
-      }
-      auto id = getWeightedRandomIndex(weights);
-      return candidates[id];
-
-    } else {
-      // no op connections to this op has been covered, weights should be the
-      // same
-      return candidates[UR(candidates.size())];
-    }
-  } else {
     return candidates[UR(candidates.size())];
-  }
 }
 
 std::vector<TypeValue>

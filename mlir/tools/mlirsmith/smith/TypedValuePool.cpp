@@ -229,7 +229,7 @@ TypeValue TypedValuePool::generateInteger(OpBuilder &builder, Location loc,
                                           IntegerType type) {
   auto res = builder.create<arith::ConstantIntOp>(loc, UR(2), type);
   auto tVal = TypeValue(type, res);
-  addIntOrFloat(tVal, "");
+  addIntOrFloat(tVal);
   return tVal;
 }
 
@@ -239,7 +239,7 @@ TypeValue TypedValuePool::generateFloat(OpBuilder &builder, Location loc,
   auto one = APFloat(type.getFloatSemantics(), 1);
   auto res = builder.create<arith::ConstantFloatOp>(loc, one, type);
   auto tVal = TypeValue(type, res);
-  addIntOrFloat(tVal, "");
+  addIntOrFloat(tVal);
   return tVal;
 }
 

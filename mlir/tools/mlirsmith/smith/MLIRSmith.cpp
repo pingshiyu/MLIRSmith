@@ -2,6 +2,7 @@
 // Created by Stan Wang on 2022/9/13.
 //
 
+#include "smith/generators/OpGeneration.h"
 #include "smith/MLIRSmith.h"
 #include "mlir/Dialect/Index/IR/IndexDialect.h"
 #include "mlir/Dialect/SPIRV/IR/SPIRVDialect.h"

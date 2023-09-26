@@ -12,6 +12,7 @@ body: |
     ; CHECK: liveins: $x3
     ; CHECK-NEXT: {{  $}}
     ; CHECK-NEXT: [[COPY:%[0-9]+]]:g8rc = COPY killed $x3
+    ; CHECK-NEXT: dead [[RLDICL:%[0-9]+]]:g8rc = RLDICL [[COPY]], 0, 32
     ; CHECK-NEXT: [[ANDI8_rec:%[0-9]+]]:g8rc = ANDI8_rec killed [[COPY]], 1, implicit-def dead $cr0
     ; CHECK-NEXT: $x3 = COPY killed [[ANDI8_rec]]
     ; CHECK-NEXT: BLR8 implicit $lr8, implicit $rm, implicit killed $x3
@@ -31,6 +32,7 @@ body: |
     ; CHECK: liveins: $x3
     ; CHECK-NEXT: {{  $}}
     ; CHECK-NEXT: [[COPY:%[0-9]+]]:g8rc = COPY killed $x3
+    ; CHECK-NEXT: dead [[RLDICL:%[0-9]+]]:g8rc = RLDICL [[COPY]], 10, 60
     ; CHECK-NEXT: [[ANDI8_rec:%[0-9]+]]:g8rc = ANDI8_rec killed [[COPY]], 0, implicit-def dead $cr0
     ; CHECK-NEXT: $x3 = COPY killed [[ANDI8_rec]]
     ; CHECK-NEXT: BLR8 implicit $lr8, implicit $rm, implicit killed $x3
@@ -50,6 +52,7 @@ body: |
     ; CHECK: liveins: $x3
     ; CHECK-NEXT: {{  $}}
     ; CHECK-NEXT: [[COPY:%[0-9]+]]:g8rc = COPY killed $x3
+    ; CHECK-NEXT: dead [[RLDICR:%[0-9]+]]:g8rc = RLDICR [[COPY]], 0, 60
     ; CHECK-NEXT: [[ANDI8_rec:%[0-9]+]]:g8rc = ANDI8_rec killed [[COPY]], 16, implicit-def dead $cr0
     ; CHECK-NEXT: $x3 = COPY killed [[ANDI8_rec]]
     ; CHECK-NEXT: BLR8 implicit $lr8, implicit $rm, implicit killed $x3
@@ -69,6 +72,7 @@ body: |
     ; CHECK: liveins: $x3
     ; CHECK-NEXT: {{  $}}
     ; CHECK-NEXT: [[COPY:%[0-9]+]]:g8rc = COPY killed $x3
+    ; CHECK-NEXT: dead [[RLDICR:%[0-9]+]]:g8rc = RLDICR [[COPY]], 10, 60
     ; CHECK-NEXT: [[ANDI8_rec:%[0-9]+]]:g8rc = ANDI8_rec killed [[COPY]], 0, implicit-def dead $cr0
     ; CHECK-NEXT: $x3 = COPY killed [[ANDI8_rec]]
     ; CHECK-NEXT: BLR8 implicit $lr8, implicit $rm, implicit killed $x3
@@ -88,6 +92,7 @@ body: |
     ; CHECK: liveins: $x3
     ; CHECK-NEXT: {{  $}}
     ; CHECK-NEXT: [[COPY:%[0-9]+]]:g8rc = COPY killed $x3
+    ; CHECK-NEXT: dead [[RLDICL:%[0-9]+]]:g8rc = RLDICL [[COPY]], 0, 32
     ; CHECK-NEXT: [[ANDIS8_rec:%[0-9]+]]:g8rc = ANDIS8_rec killed [[COPY]], 1, implicit-def dead $cr0
     ; CHECK-NEXT: $x3 = COPY killed [[ANDIS8_rec]]
     ; CHECK-NEXT: BLR8 implicit $lr8, implicit $rm, implicit killed $x3
@@ -107,6 +112,7 @@ body: |
     ; CHECK: liveins: $x3
     ; CHECK-NEXT: {{  $}}
     ; CHECK-NEXT: [[COPY:%[0-9]+]]:g8rc = COPY killed $x3
+    ; CHECK-NEXT: dead [[RLDICL:%[0-9]+]]:g8rc = RLDICL [[COPY]], 10, 60
     ; CHECK-NEXT: [[ANDIS8_rec:%[0-9]+]]:g8rc = ANDIS8_rec killed [[COPY]], 0, implicit-def dead $cr0
     ; CHECK-NEXT: $x3 = COPY killed [[ANDIS8_rec]]
     ; CHECK-NEXT: BLR8 implicit $lr8, implicit $rm, implicit killed $x3
@@ -126,6 +132,7 @@ body: |
     ; CHECK: liveins: $x3
     ; CHECK-NEXT: {{  $}}
     ; CHECK-NEXT: [[COPY:%[0-9]+]]:g8rc = COPY killed $x3
+    ; CHECK-NEXT: dead [[RLDICR:%[0-9]+]]:g8rc = RLDICR [[COPY]], 0, 60
     ; CHECK-NEXT: [[ANDIS8_rec:%[0-9]+]]:g8rc = ANDIS8_rec killed [[COPY]], 16, implicit-def dead $cr0
     ; CHECK-NEXT: $x3 = COPY killed [[ANDIS8_rec]]
     ; CHECK-NEXT: BLR8 implicit $lr8, implicit $rm, implicit killed $x3
@@ -145,6 +152,7 @@ body: |
     ; CHECK: liveins: $x3
     ; CHECK-NEXT: {{  $}}
     ; CHECK-NEXT: [[COPY:%[0-9]+]]:g8rc = COPY killed $x3
+    ; CHECK-NEXT: dead [[RLDICR:%[0-9]+]]:g8rc = RLDICR [[COPY]], 10, 32
     ; CHECK-NEXT: [[ANDIS8_rec:%[0-9]+]]:g8rc = ANDIS8_rec killed [[COPY]], 0, implicit-def dead $cr0
     ; CHECK-NEXT: $x3 = COPY killed [[ANDIS8_rec]]
     ; CHECK-NEXT: BLR8 implicit $lr8, implicit $rm, implicit killed $x3

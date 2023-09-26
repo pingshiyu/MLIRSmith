@@ -1214,6 +1214,14 @@ bool PPCMIPeephole::simplifyCode() {
         if (SrcOpCode != PPC::RLDICL && SrcOpCode != PPC::RLDICR)
           break;
 
+        Register SrcReg, DstReg;
+        SrcReg = SrcMI->getOperand(1).getReg();
+        DstReg = MI.getOperand(1).getReg();
+        const TargetRegisterClass *SrcRC = MRI->getRegClassOrNull(SrcReg);
+        const TargetRegisterClass *DstRC = MRI->getRegClassOrNull(DstReg);
+        if (DstRC != SrcRC)
+          break;
+
         uint64_t AndImm = MI.getOperand(2).getImm();
         if (MI.getOpcode() == PPC::ANDIS_rec ||
             MI.getOpcode() == PPC::ANDIS8_rec)
@@ -1244,11 +1252,11 @@ bool PPCMIPeephole::simplifyCode() {
         if (PatternResultZero)
           MI.getOperand(2).setImm(0);
         MI.getOperand(1).setReg(SrcMI->getOperand(1).getReg());
-        addRegToUpdate(MI.getOperand(1).getReg());
         LLVM_DEBUG(dbgs() << "To: ");
         LLVM_DEBUG(MI.dump());
+        addRegToUpdate(MI.getOperand(1).getReg());
+        addRegToUpdate(SrcMI->getOperand(0).getReg());
         Simplified = true;
-        SrcMI->eraseFromParent();
         break;
       }
       case PPC::RLWINM:

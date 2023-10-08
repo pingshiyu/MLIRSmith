@@ -14,7 +14,14 @@ enum PoolType {
   DynamicShapedMemref,
   IntOrFloat,
   Vector,
-  Index
+  Index,
+  SPIRVArray,
+  SPIRVImage,
+  SPIRVPointer,
+  SPIRVRtArray,
+  SPIRVSampledImage,
+  SPIRVStruct,
+  Unknown
 };
 
 inline std::vector<PoolType> allTypes = {PoolType::StaticShapedTensor,
@@ -23,11 +30,18 @@ inline std::vector<PoolType> allTypes = {PoolType::StaticShapedTensor,
                                          PoolType::DynamicShapedMemref,
                                          PoolType::IntOrFloat,
                                          PoolType::Vector,
-                                         PoolType::Index};
+                                         PoolType::Index,
+                                         PoolType::SPIRVArray,
+                                         PoolType::SPIRVImage,
+                                         PoolType::SPIRVPointer,
+                                         PoolType::SPIRVRtArray,
+                                         PoolType::SPIRVSampledImage,
+                                         PoolType::SPIRVStruct};
 
 using InitValueGenerator = std::function<TypeValue(OpBuilder &, Location)>;
 
 struct TypedValuePool {
+  std::map<PoolType, std::vector<TypeValue>> typeValues;
   std::vector<TypeValue> staticShapedTensorPool;
   std::vector<TypeValue> dynamicShapedTensorPool;
   std::vector<TypeValue> staticShapedMemrefPool;
@@ -62,26 +76,37 @@ struct TypedValuePool {
         dynamicShapedTensorPool(dynamicShapedTensorPool),
         staticShapedMemrefPool(staticShapedMemrefPool),
         dynamicShapedMemrefPool(dynamicShapedMemrefPool),
-        unrankedMemrefPool(unrankedMemrefPool),
-        unrankedTensorPool(unrankedTensorPool), intOrFloatPool(intOrFloatPool),
+        unrankedTensorPool(unrankedTensorPool),
+        unrankedMemrefPool(unrankedMemrefPool), intOrFloatPool(intOrFloatPool),
         vectorPool(vectorPool), indexPool(indexPool),
         constantIndices(constantIndices), affineExprPool(affineExprPool),
-        affineMapPool(affineMapPool), integerSetPool(integerSetPool) {}
+        affineMapPool(affineMapPool), integerSetPool(integerSetPool) {
+    for (auto type : allTypes) {
+      typeValues.insert(std::make_pair(type, std::vector<TypeValue>()));
+    }
+    typeValues.insert(std::make_pair(PoolType::IntOrFloat, intOrFloatPool));
+    typeValues.insert(std::make_pair(PoolType::Vector, vectorPool));
+    typeValues.insert(std::make_pair(PoolType::Index, indexPool));
+    typeValues.insert(
+        std::make_pair(PoolType::DynamicShapedTensor, dynamicShapedTensorPool));
+    typeValues.insert(
+        std::make_pair(PoolType::StaticShapedTensor, staticShapedTensorPool));
+    typeValues.insert(
+        std::make_pair(PoolType::DynamicShapedMemref, dynamicShapedMemrefPool));
+    typeValues.insert(
+        std::make_pair(PoolType::StaticShapedMemref, staticShapedMemrefPool));
+  }
 
   void clearAll() {
-    staticShapedTensorPool.clear();
-    dynamicShapedTensorPool.clear();
-    staticShapedMemrefPool.clear();
-    dynamicShapedMemrefPool.clear();
-    unrankedMemrefPool.clear();
-    unrankedTensorPool.clear();
-    intOrFloatPool.clear();
-    vectorPool.clear();
-    indexPool.clear();
+    for (auto &item : typeValues) {
+      item.second.clear();
+    }
     constantIndices.clear();
     affineExprPool.clear();
     affineMapPool.clear();
     integerSetPool.clear();
+    unrankedMemrefPool.clear();
+    unrankedTensorPool.clear();
   }
 
   void merge(TypedValuePool &pool) {
@@ -119,7 +144,7 @@ struct TypedValuePool {
                           pool.integerSetPool.end());
   }
 
-  void addTypeValue(const TypeValue &typedValue, std::string op = "");
+  void addTypeValue(const TypeValue &typedValue, std::string op = "", PoolType ty = PoolType::Unknown);
   void addIntOrFloat(const TypeValue &val, std::string op);
   void addElement(const TypeValue &element, std::string op);
   void addRankedMemref(const TypeValue &memref, std::string op);

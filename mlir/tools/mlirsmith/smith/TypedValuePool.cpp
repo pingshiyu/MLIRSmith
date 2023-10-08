@@ -4,26 +4,57 @@
 
 #include "../include/smith/TypedValuePool.h"
 
-void TypedValuePool::addTypeValue(const TypeValue &typedValue, std::string op) {
-  if (typedValue.type.dyn_cast<RankedTensorType>()) {
-    auto t = typedValue.type.dyn_cast<RankedTensorType>();
-    if (t.hasStaticShape()) {
-      addStaticShapedTensor(typedValue, op);
-    } else {
-      addDynamicShapedTensor(typedValue, op);
-    }
-  } else if (typedValue.type.dyn_cast<MemRefType>()) {
-    if (typedValue.type.dyn_cast<MemRefType>().hasStaticShape()) {
-      addStaticShapedMemref(typedValue, op);
-    } else {
-      addDynamicShapedMemref(typedValue, op);
-    }
-
-  } else if (typedValue.type.isIntOrFloat()) {
-    addIntOrFloat(typedValue, op);
-  } else if (typedValue.type.dyn_cast<IndexType>()) {
-    addIndex(typedValue, op);
+void TypedValuePool::addTypeValue(const TypeValue &typedValue, std::string op,
+                                  PoolType ty) {
+  assert(typedValue.val) switch (ty) {
+  case PoolType::Index: {
+    assert(typedValue.type.isa<IndexType>());
   }
+  case PoolType::IntOrFloat: {
+    assert(typedValue.type.isIntOrFloat());
+  }
+  case PoolType::Vector: {
+    assert(typedValue.type.isa<VectorType>());
+  }
+  case PoolType::StaticShapedMemref: {
+    assert(typedValue.type.isa<MemRefType>() &&
+           typedValue.type.dyn_cast<MemRefType>().hasStaticShape());
+  }
+  case PoolType::DynamicShapedMemref: {
+    assert(typedValue.type.isa<MemRefType>() &&
+           typedValue.type.dyn_cast<MemRefType>().hasRank());
+  }
+  case PoolType::StaticShapedTensor: {
+    assert(typedValue.type.isa<TensorType>() &&
+           typedValue.type.dyn_cast<TensorType>().hasStaticShape());
+  }
+  case PoolType::DynamicShapedTensor: {
+    assert(typedValue.type.isa<TensorType>() &&
+           typedValue.type.dyn_cast<TensorType>().hasRank());
+  }
+  case PoolType::Unknown: {
+    if (typedValue.type.dyn_cast<RankedTensorType>()) {
+      auto t = typedValue.type.dyn_cast<RankedTensorType>();
+      if (t.hasStaticShape()) {
+        addStaticShapedTensor(typedValue, op);
+      } else {
+        addDynamicShapedTensor(typedValue, op);
+      }
+    } else if (typedValue.type.dyn_cast<MemRefType>()) {
+      if (typedValue.type.dyn_cast<MemRefType>().hasStaticShape()) {
+        addStaticShapedMemref(typedValue, op);
+      } else {
+        addDynamicShapedMemref(typedValue, op);
+      }
+    } else if (typedValue.type.isIntOrFloat()) {
+      addIntOrFloat(typedValue, op);
+    } else if (typedValue.type.dyn_cast<IndexType>()) {
+      addIndex(typedValue, op);
+    }
+    return;
+  }
+  }
+  typeValues[ty].push_back(typedValue);
 }
 
 void TypedValuePool::addIntOrFloat(const TypeValue &element,
@@ -318,8 +349,8 @@ TypeValue TypedValuePool::generateDynamicShapedTensor(OpBuilder &builder,
 }
 
 TypeValue TypedValuePool::generateRankedMemref(mlir::OpBuilder &builder,
-                                         mlir::Location loc,
-                                         mlir::MemRefType type) {
+                                               mlir::Location loc,
+                                               mlir::MemRefType type) {
   if (type.hasStaticShape()) {
     return generateStaticShapedMemref(builder, loc, type);
   } else {

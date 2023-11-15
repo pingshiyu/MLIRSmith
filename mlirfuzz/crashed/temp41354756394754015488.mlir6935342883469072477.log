@@ -1,0 +1,23 @@
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: ../build/bin/mlir-opt --test-pass-crash generated/temp41354756394754015488.mlir
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlir-opt        0x0000563b87057bdb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 59
+1  mlir-opt        0x0000563b870549cc
+2  libpthread.so.0 0x00007f19e0f0f980
+3  libc.so.6       0x00007f19dfb3ce87 gsignal + 199
+4  libc.so.6       0x00007f19dfb3e7f1 abort + 321
+5  mlir-opt        0x0000563b89686e59
+6  mlir-opt        0x0000563b897cf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+7  mlir-opt        0x0000563b897d0223
+8  mlir-opt        0x0000563b897d08c1 mlir::PassManager::run(mlir::Operation*) + 1153
+9  mlir-opt        0x0000563b897c0efc
+10 mlir-opt        0x0000563b897c28b5
+11 mlir-opt        0x0000563b897c2a71
+12 mlir-opt        0x0000563b898c8260 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) + 96
+13 mlir-opt        0x0000563b897bbbc9 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) + 185
+14 mlir-opt        0x0000563b897c2d9a mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) + 746
+15 mlir-opt        0x0000563b86faa0c5 main + 165
+16 libc.so.6       0x00007f19dfb1fc87 __libc_start_main + 231
+17 mlir-opt        0x0000563b8702b95a _start + 42
+Aborted

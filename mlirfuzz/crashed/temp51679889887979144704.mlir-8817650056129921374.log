@@ -1,0 +1,28 @@
+mlir-opt: /home/jacob/projects/MLIRSmith/mlir/lib/Dialect/Vector/IR/VectorOps.cpp:3097: mlir::Type inferStridedSliceOpResultType(mlir::VectorType, mlir::ArrayAttr, mlir::ArrayAttr, mlir::ArrayAttr): Assertion `offsets.size() == sizes.size() && offsets.size() == strides.size()' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlir-opt        0x0000564326257bdb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 59
+1  mlir-opt        0x00005643262549cc
+2  libpthread.so.0 0x00007fd267926980
+3  libc.so.6       0x00007fd266553e87 gsignal + 199
+4  libc.so.6       0x00007fd2665557f1 abort + 321
+5  libc.so.6       0x00007fd2665453fa
+6  libc.so.6       0x00007fd266545472
+7  mlir-opt        0x0000564327e47559
+8  mlir-opt        0x0000564327e47647 mlir::vector::ExtractStridedSliceOp::build(mlir::OpBuilder&, mlir::OperationState&, mlir::Value, llvm::ArrayRef<long>, llvm::ArrayRef<long>, llvm::ArrayRef<long>) + 231
+9  mlir-opt        0x0000564327f144c5
+10 mlir-opt        0x000056432b3a5bd4 mlir::PatternApplicator::matchAndRewrite(mlir::Operation*, mlir::PatternRewriter&, llvm::function_ref<bool (mlir::Pattern const&)>, llvm::function_ref<void (mlir::Pattern const&)>, llvm::function_ref<mlir::LogicalResult (mlir::Pattern const&)>) + 2884
+11 mlir-opt        0x0000564328a8dc50
+12 mlir-opt        0x0000564328a915b1 mlir::applyPatternsAndFoldGreedily(mlir::Region&, mlir::FrozenRewritePatternSet const&, mlir::GreedyRewriteConfig, bool*) + 3153
+13 mlir-opt        0x00005643289224da
+14 mlir-opt        0x00005643289292cc
+15 mlir-opt        0x00005643289cf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+16 mlir-opt        0x00005643289cf6ba mlir::detail::OpToOpPassAdaptor::runPipeline(mlir::OpPassManager&, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int, mlir::PassInstrumentor*, mlir::PassInstrumentation::PipelineParentInfo const*) + 250
+17 mlir-opt        0x00005643289cfab2
+18 mlir-opt        0x00005643289cfc3f
+19 mlir-opt        0x00005643289c4b11 std::_Function_handler<void (), llvm::ThreadPool::createTaskAndFuture(std::function<void ()>)::'lambda'()>::_M_invoke(std::_Any_data const&) + 49
+20 mlir-opt        0x000056432b56d0b8 llvm::ThreadPool::processTasks(llvm::ThreadPoolTaskGroup*) + 552
+21 mlir-opt        0x000056432b56e0b3
+22 libpthread.so.0 0x00007fd26791b6db
+23 libc.so.6       0x00007fd26663661f clone + 63
+Aborted

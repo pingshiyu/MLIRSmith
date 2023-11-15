@@ -1,0 +1,29 @@
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlirsmith       0x000055ae2b12b66b
+1  mlirsmith       0x000055ae2b128b7c
+2  libpthread.so.0 0x00007f41cf869980
+3  mlirsmith       0x000055ae2b1529e5
+4  mlirsmith       0x000055ae2b1629f3
+5  mlirsmith       0x000055ae2b163908
+6  mlirsmith       0x000055ae2b1629b8
+7  mlirsmith       0x000055ae2b163a7e
+8  mlirsmith       0x000055ae2b0b670d
+9  mlirsmith       0x000055ae2b0bfe73
+10 mlirsmith       0x000055ae2b0b4170
+11 mlirsmith       0x000055ae2b06577e
+12 mlirsmith       0x000055ae2bb11a39
+13 mlirsmith       0x000055ae2b0611df
+14 mlirsmith       0x000055ae2b0b4170
+15 mlirsmith       0x000055ae2b064088
+16 mlirsmith       0x000055ae2b064680
+17 mlirsmith       0x000055ae2b0b4170
+18 mlirsmith       0x000055ae2b05eb7b
+19 mlirsmith       0x000055ae2b0b4170
+20 mlirsmith       0x000055ae2b02e1ad
+21 mlirsmith       0x000055ae2b02e658
+22 mlirsmith       0x000055ae2b02393c
+23 mlirsmith       0x000055ae2af5fb6d
+24 libc.so.6       0x00007f41ce48ec87 __libc_start_main + 231
+25 mlirsmith       0x000055ae2b00303a
+Segmentation fault

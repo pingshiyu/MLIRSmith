@@ -1,0 +1,32 @@
+mlir-opt: /home/jacob/projects/MLIRSmith/mlir/lib/IR/PatternMatch.cpp:270: virtual void mlir::RewriterBase::replaceOp(mlir::Operation*, mlir::ValueRange): Assertion `op->getNumResults() == newValues.size() && "incorrect # of replacement values"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: ../build/bin/mlir-opt --linalg-generalize-named-ops generated/temp581529840236588062208.mlir
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlir-opt        0x000055ce1b457bdb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 59
+1  mlir-opt        0x000055ce1b4549cc
+2  libpthread.so.0 0x00007efda6c04980
+3  libc.so.6       0x00007efda5831e87 gsignal + 199
+4  libc.so.6       0x00007efda58337f1 abort + 321
+5  libc.so.6       0x00007efda58233fa
+6  libc.so.6       0x00007efda5823472
+7  mlir-opt        0x000055ce1ddd01dd mlir::RewriterBase::replaceOp(mlir::Operation*, mlir::ValueRange) + 541
+8  mlir-opt        0x000055ce1bf19b76 mlir::linalg::generalizeNamedOp(mlir::RewriterBase&, mlir::linalg::LinalgOp) + 1942
+9  mlir-opt        0x000055ce1bf1a22b
+10 mlir-opt        0x000055ce205a5bd4 mlir::PatternApplicator::matchAndRewrite(mlir::Operation*, mlir::PatternRewriter&, llvm::function_ref<bool (mlir::Pattern const&)>, llvm::function_ref<void (mlir::Pattern const&)>, llvm::function_ref<mlir::LogicalResult (mlir::Pattern const&)>) + 2884
+11 mlir-opt        0x000055ce1dc8dc50
+12 mlir-opt        0x000055ce1dc915b1 mlir::applyPatternsAndFoldGreedily(mlir::Region&, mlir::FrozenRewritePatternSet const&, mlir::GreedyRewriteConfig, bool*) + 3153
+13 mlir-opt        0x000055ce1bf18e4a
+14 mlir-opt        0x000055ce1dbcf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+15 mlir-opt        0x000055ce1dbd0223
+16 mlir-opt        0x000055ce1dbd08c1 mlir::PassManager::run(mlir::Operation*) + 1153
+17 mlir-opt        0x000055ce1dbc0efc
+18 mlir-opt        0x000055ce1dbc28b5
+19 mlir-opt        0x000055ce1dbc2a71
+20 mlir-opt        0x000055ce1dcc8260 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) + 96
+21 mlir-opt        0x000055ce1dbbbbc9 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) + 185
+22 mlir-opt        0x000055ce1dbc2d9a mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) + 746
+23 mlir-opt        0x000055ce1b3aa0c5 main + 165
+24 libc.so.6       0x00007efda5814c87 __libc_start_main + 231
+25 mlir-opt        0x000055ce1b42b95a _start + 42
+Aborted

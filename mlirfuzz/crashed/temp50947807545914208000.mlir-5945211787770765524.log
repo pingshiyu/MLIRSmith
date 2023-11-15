@@ -1,0 +1,58 @@
+generated/temp50947807545914208000.mlir:268:12: error: Test iterating `int64_t`: unable to iterate type
+    %138 = vector.broadcast %c687914069_i32 : i32 to vector<18xi32>
+           ^
+generated/temp50947807545914208000.mlir:268:12: note: see current operation: %1 = "arith.constant"() <{value = dense<687914069> : vector<18xi32>}> : () -> vector<18xi32>
+generated/temp50947807545914208000.mlir:268:12: error: Test iterating `uint64_t`: unable to iterate type
+    %138 = vector.broadcast %c687914069_i32 : i32 to vector<18xi32>
+           ^
+generated/temp50947807545914208000.mlir:268:12: note: see current operation: %1 = "arith.constant"() <{value = dense<687914069> : vector<18xi32>}> : () -> vector<18xi32>
+generated/temp50947807545914208000.mlir:268:12: error: Test iterating `APInt`: 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069, 687914069
+    %138 = vector.broadcast %c687914069_i32 : i32 to vector<18xi32>
+           ^
+generated/temp50947807545914208000.mlir:268:12: note: see current operation: %1 = "arith.constant"() <{value = dense<687914069> : vector<18xi32>}> : () -> vector<18xi32>
+generated/temp50947807545914208000.mlir:268:12: error: Test iterating `IntegerAttr`: 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32, 687914069 : i32
+    %138 = vector.broadcast %c687914069_i32 : i32 to vector<18xi32>
+           ^
+generated/temp50947807545914208000.mlir:268:12: note: see current operation: %1 = "arith.constant"() <{value = dense<687914069> : vector<18xi32>}> : () -> vector<18xi32>
+generated/temp50947807545914208000.mlir:225:12: error: Test iterating `int64_t`: unable to iterate type
+    %106 = vector.broadcast %cst_0 : f32 to vector<9xf32>
+           ^
+generated/temp50947807545914208000.mlir:225:12: note: see current operation: %2 = "arith.constant"() <{value = dense<1.30397427E+9> : vector<9xf32>}> : () -> vector<9xf32>
+generated/temp50947807545914208000.mlir:225:12: error: Test iterating `uint64_t`: unable to iterate type
+    %106 = vector.broadcast %cst_0 : f32 to vector<9xf32>
+           ^
+generated/temp50947807545914208000.mlir:225:12: note: see current operation: %2 = "arith.constant"() <{value = dense<1.30397427E+9> : vector<9xf32>}> : () -> vector<9xf32>
+generated/temp50947807545914208000.mlir:225:12: error: Test iterating `APInt`: unable to iterate type
+    %106 = vector.broadcast %cst_0 : f32 to vector<9xf32>
+           ^
+generated/temp50947807545914208000.mlir:225:12: note: see current operation: %2 = "arith.constant"() <{value = dense<1.30397427E+9> : vector<9xf32>}> : () -> vector<9xf32>
+mlir-opt: /home/jacob/projects/MLIRSmith/llvm/include/llvm/Support/Casting.h:572: decltype(auto) llvm::cast(From&) [with To = mlir::IntegerAttr; From = mlir::Attribute]: Assertion `isa<To>(Val) && "cast<Ty>() argument of incompatible type!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: ../build/bin/mlir-opt --test-spirv-entry-point-abi --shape-to-shape-lowering --tosa-to-scf --linalg-named-op-conversion --generate-merged-base-profiles --test-elements-attr-interface --test-memref-dependence-check --test-loop-permutation --spirv-unify-aliased-resource --convert-linalg-to-affine-loops generated/temp50947807545914208000.mlir
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlir-opt        0x000055ff4fa57bdb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 59
+1  mlir-opt        0x000055ff4fa549cc
+2  libpthread.so.0 0x00007f47e3fa6980
+3  libc.so.6       0x00007f47e2bd3e87 gsignal + 199
+4  libc.so.6       0x00007f47e2bd57f1 abort + 321
+5  libc.so.6       0x00007f47e2bc53fa
+6  libc.so.6       0x00007f47e2bc5472
+7  mlir-opt        0x000055ff52028782
+8  mlir-opt        0x000055ff5202da74
+9  mlir-opt        0x000055ff5202f4fc
+10 mlir-opt        0x000055ff520286a9
+11 mlir-opt        0x000055ff5202e505
+12 mlir-opt        0x000055ff521cf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+13 mlir-opt        0x000055ff521d0223
+14 mlir-opt        0x000055ff521d08c1 mlir::PassManager::run(mlir::Operation*) + 1153
+15 mlir-opt        0x000055ff521c0efc
+16 mlir-opt        0x000055ff521c28b5
+17 mlir-opt        0x000055ff521c2a71
+18 mlir-opt        0x000055ff522c8260 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) + 96
+19 mlir-opt        0x000055ff521bbbc9 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) + 185
+20 mlir-opt        0x000055ff521c2d9a mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) + 746
+21 mlir-opt        0x000055ff4f9aa0c5 main + 165
+22 libc.so.6       0x00007f47e2bb6c87 __libc_start_main + 231
+23 mlir-opt        0x000055ff4fa2b95a _start + 42
+Aborted

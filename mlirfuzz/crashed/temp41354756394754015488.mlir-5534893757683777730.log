@@ -1,0 +1,37 @@
+mlir-opt: /home/jacob/projects/MLIRSmith/llvm/include/llvm/Support/Casting.h:566: decltype(auto) llvm::cast(const From&) [with To = mlir::RankedTensorType; From = mlir::Type]: Assertion `isa<To>(Val) && "cast<Ty>() argument of incompatible type!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: ../build/bin/mlir-opt --sparse-compiler generated/temp41354756394754015488.mlir
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlir-opt        0x0000562356257bdb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 59
+1  mlir-opt        0x00005623562549cc
+2  libpthread.so.0 0x00007f74d2c37980
+3  libc.so.6       0x00007f74d1864e87 gsignal + 199
+4  libc.so.6       0x00007f74d18667f1 abort + 321
+5  libc.so.6       0x00007f74d18563fa
+6  libc.so.6       0x00007f74d1856472
+7  mlir-opt        0x00005623577ce1e6
+8  mlir-opt        0x00005623577f42ae
+9  mlir-opt        0x000056235699b0e7
+10 mlir-opt        0x000056235b3a5bd4 mlir::PatternApplicator::matchAndRewrite(mlir::Operation*, mlir::PatternRewriter&, llvm::function_ref<bool (mlir::Pattern const&)>, llvm::function_ref<void (mlir::Pattern const&)>, llvm::function_ref<mlir::LogicalResult (mlir::Pattern const&)>) + 2884
+11 mlir-opt        0x0000562358a8dc50
+12 mlir-opt        0x0000562358a915b1 mlir::applyPatternsAndFoldGreedily(mlir::Region&, mlir::FrozenRewritePatternSet const&, mlir::GreedyRewriteConfig, bool*) + 3153
+13 mlir-opt        0x00005623577b7e5a
+14 mlir-opt        0x00005623577ba67c
+15 mlir-opt        0x00005623589cf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+16 mlir-opt        0x00005623589cf6ba mlir::detail::OpToOpPassAdaptor::runPipeline(mlir::OpPassManager&, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int, mlir::PassInstrumentor*, mlir::PassInstrumentation::PipelineParentInfo const*) + 250
+17 mlir-opt        0x00005623589d00b4
+18 mlir-opt        0x00005623577f7767
+19 mlir-opt        0x00005623589cf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+20 mlir-opt        0x00005623589d0223
+21 mlir-opt        0x00005623589d08c1 mlir::PassManager::run(mlir::Operation*) + 1153
+22 mlir-opt        0x00005623589c0efc
+23 mlir-opt        0x00005623589c28b5
+24 mlir-opt        0x00005623589c2a71
+25 mlir-opt        0x0000562358ac8260 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) + 96
+26 mlir-opt        0x00005623589bbbc9 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) + 185
+27 mlir-opt        0x00005623589c2d9a mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) + 746
+28 mlir-opt        0x00005623561aa0c5 main + 165
+29 libc.so.6       0x00007f74d1847c87 __libc_start_main + 231
+30 mlir-opt        0x000056235622b95a _start + 42
+Aborted

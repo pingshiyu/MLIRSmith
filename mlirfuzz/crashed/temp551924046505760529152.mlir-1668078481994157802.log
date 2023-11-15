@@ -1,0 +1,38 @@
+mlir-opt: /home/jacob/projects/MLIRSmith/llvm/include/llvm/ADT/SmallVector.h:294: T& llvm::SmallVectorTemplateCommon<T, <template-parameter-1-2> >::operator[](llvm::SmallVectorTemplateCommon<T, <template-parameter-1-2> >::size_type) [with T = mlir::Attribute; <template-parameter-1-2> = void; llvm::SmallVectorTemplateCommon<T, <template-parameter-1-2> >::reference = mlir::Attribute&; llvm::SmallVectorTemplateCommon<T, <template-parameter-1-2> >::size_type = long unsigned int]: Assertion `idx < size()' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: ../build/bin/mlir-opt --test-written-to generated/temp551924046505760529152.mlir
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlir-opt        0x0000563501c57bdb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 59
+1  mlir-opt        0x0000563501c549cc
+2  libpthread.so.0 0x00007f19155ba980
+3  libc.so.6       0x00007f19141e7e87 gsignal + 199
+4  libc.so.6       0x00007f19141e97f1 abort + 321
+5  libc.so.6       0x00007f19141d93fa
+6  libc.so.6       0x00007f19141d9472
+7  mlir-opt        0x000056350387ee38
+8  mlir-opt        0x00005635038b29a3
+9  mlir-opt        0x00005635038c1270
+10 mlir-opt        0x00005635045c34de mlir::Operation::fold(llvm::ArrayRef<mlir::Attribute>, llvm::SmallVectorImpl<mlir::OpFoldResult>&) + 62
+11 mlir-opt        0x00005635043975ee mlir::dataflow::SparseConstantPropagation::visitOperation(mlir::Operation*, llvm::ArrayRef<mlir::dataflow::Lattice<mlir::dataflow::ConstantValue> const*>, llvm::ArrayRef<mlir::dataflow::Lattice<mlir::dataflow::ConstantValue>*>) + 1086
+12 mlir-opt        0x00005635043b2c2a mlir::dataflow::AbstractSparseForwardDataFlowAnalysis::visitOperation(mlir::Operation*) + 1114
+13 mlir-opt        0x00005635043b4389 mlir::dataflow::AbstractSparseForwardDataFlowAnalysis::initializeRecursively(mlir::Operation*) + 25
+14 mlir-opt        0x00005635043b44c5 mlir::dataflow::AbstractSparseForwardDataFlowAnalysis::initializeRecursively(mlir::Operation*) + 341
+15 mlir-opt        0x00005635043b44c5 mlir::dataflow::AbstractSparseForwardDataFlowAnalysis::initializeRecursively(mlir::Operation*) + 341
+16 mlir-opt        0x00005635043b44c5 mlir::dataflow::AbstractSparseForwardDataFlowAnalysis::initializeRecursively(mlir::Operation*) + 341
+17 mlir-opt        0x00005635043b44c5 mlir::dataflow::AbstractSparseForwardDataFlowAnalysis::initializeRecursively(mlir::Operation*) + 341
+18 mlir-opt        0x00005635043609a4 mlir::DataFlowSolver::initializeAndRun(mlir::Operation*) + 100
+19 mlir-opt        0x0000563503eb8a1b
+20 mlir-opt        0x00005635043cf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+21 mlir-opt        0x00005635043d0223
+22 mlir-opt        0x00005635043d08c1 mlir::PassManager::run(mlir::Operation*) + 1153
+23 mlir-opt        0x00005635043c0efc
+24 mlir-opt        0x00005635043c28b5
+25 mlir-opt        0x00005635043c2a71
+26 mlir-opt        0x00005635044c8260 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) + 96
+27 mlir-opt        0x00005635043bbbc9 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) + 185
+28 mlir-opt        0x00005635043c2d9a mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) + 746
+29 mlir-opt        0x0000563501baa0c5 main + 165
+30 libc.so.6       0x00007f19141cac87 __libc_start_main + 231
+31 mlir-opt        0x0000563501c2b95a _start + 42
+Aborted

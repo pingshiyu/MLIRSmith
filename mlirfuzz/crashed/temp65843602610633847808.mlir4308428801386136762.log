@@ -1,0 +1,122 @@
+generated/temp65843602610633847808.mlir:93:11: error: Test iterating `int64_t`: unable to iterate type
+    %23 = vector.broadcast %c0_i32 : i32 to vector<2xi32>
+          ^
+generated/temp65843602610633847808.mlir:93:11: note: see current operation: %0 = "arith.constant"() <{value = dense<0> : vector<2xi32>}> : () -> vector<2xi32>
+generated/temp65843602610633847808.mlir:93:11: error: Test iterating `uint64_t`: unable to iterate type
+    %23 = vector.broadcast %c0_i32 : i32 to vector<2xi32>
+          ^
+generated/temp65843602610633847808.mlir:93:11: note: see current operation: %0 = "arith.constant"() <{value = dense<0> : vector<2xi32>}> : () -> vector<2xi32>
+generated/temp65843602610633847808.mlir:93:11: error: Test iterating `APInt`: 0, 0
+    %23 = vector.broadcast %c0_i32 : i32 to vector<2xi32>
+          ^
+generated/temp65843602610633847808.mlir:93:11: note: see current operation: %0 = "arith.constant"() <{value = dense<0> : vector<2xi32>}> : () -> vector<2xi32>
+generated/temp65843602610633847808.mlir:93:11: error: Test iterating `IntegerAttr`: 0 : i32, 0 : i32
+    %23 = vector.broadcast %c0_i32 : i32 to vector<2xi32>
+          ^
+generated/temp65843602610633847808.mlir:93:11: note: see current operation: %0 = "arith.constant"() <{value = dense<0> : vector<2xi32>}> : () -> vector<2xi32>
+generated/temp65843602610633847808.mlir:499:11: error: Test iterating `int64_t`: unable to iterate type
+    %97 = vector.broadcast %true : i1 to vector<30xi1>
+          ^
+generated/temp65843602610633847808.mlir:499:11: note: see current operation: %1 = "arith.constant"() <{value = dense<true> : vector<30xi1>}> : () -> vector<30xi1>
+generated/temp65843602610633847808.mlir:499:11: error: Test iterating `uint64_t`: unable to iterate type
+    %97 = vector.broadcast %true : i1 to vector<30xi1>
+          ^
+generated/temp65843602610633847808.mlir:499:11: note: see current operation: %1 = "arith.constant"() <{value = dense<true> : vector<30xi1>}> : () -> vector<30xi1>
+generated/temp65843602610633847808.mlir:499:11: error: Test iterating `APInt`: -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+    %97 = vector.broadcast %true : i1 to vector<30xi1>
+          ^
+generated/temp65843602610633847808.mlir:499:11: note: see current operation: %1 = "arith.constant"() <{value = dense<true> : vector<30xi1>}> : () -> vector<30xi1>
+generated/temp65843602610633847808.mlir:499:11: error: Test iterating `IntegerAttr`: true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true
+    %97 = vector.broadcast %true : i1 to vector<30xi1>
+          ^
+generated/temp65843602610633847808.mlir:499:11: note: see current operation: %1 = "arith.constant"() <{value = dense<true> : vector<30xi1>}> : () -> vector<30xi1>
+generated/temp65843602610633847808.mlir:832:14: error: Test iterating `int64_t`: 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26
+      %147 = vector.broadcast %c26 : index to vector<13xindex>
+             ^
+generated/temp65843602610633847808.mlir:832:14: note: see current operation: %3 = "arith.constant"() <{value = dense<26> : vector<13xindex>}> : () -> vector<13xindex>
+generated/temp65843602610633847808.mlir:832:14: error: Test iterating `uint64_t`: 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26
+      %147 = vector.broadcast %c26 : index to vector<13xindex>
+             ^
+generated/temp65843602610633847808.mlir:832:14: note: see current operation: %3 = "arith.constant"() <{value = dense<26> : vector<13xindex>}> : () -> vector<13xindex>
+generated/temp65843602610633847808.mlir:832:14: error: Test iterating `APInt`: 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26
+      %147 = vector.broadcast %c26 : index to vector<13xindex>
+             ^
+generated/temp65843602610633847808.mlir:832:14: note: see current operation: %3 = "arith.constant"() <{value = dense<26> : vector<13xindex>}> : () -> vector<13xindex>
+generated/temp65843602610633847808.mlir:832:14: error: Test iterating `IntegerAttr`: 26 : index, 26 : index, 26 : index, 26 : index, 26 : index, 26 : index, 26 : index, 26 : index, 26 : index, 26 : index, 26 : index, 26 : index, 26 : index
+      %147 = vector.broadcast %c26 : index to vector<13xindex>
+             ^
+generated/temp65843602610633847808.mlir:832:14: note: see current operation: %3 = "arith.constant"() <{value = dense<26> : vector<13xindex>}> : () -> vector<13xindex>
+generated/temp65843602610633847808.mlir:952:16: error: Test iterating `int64_t`: unable to iterate type
+        %167 = vector.broadcast %false_19 : i1 to vector<22xi1>
+               ^
+generated/temp65843602610633847808.mlir:952:16: note: see current operation: %4 = "arith.constant"() <{value = dense<false> : vector<22xi1>}> : () -> vector<22xi1>
+generated/temp65843602610633847808.mlir:952:16: error: Test iterating `uint64_t`: unable to iterate type
+        %167 = vector.broadcast %false_19 : i1 to vector<22xi1>
+               ^
+generated/temp65843602610633847808.mlir:952:16: note: see current operation: %4 = "arith.constant"() <{value = dense<false> : vector<22xi1>}> : () -> vector<22xi1>
+generated/temp65843602610633847808.mlir:952:16: error: Test iterating `APInt`: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        %167 = vector.broadcast %false_19 : i1 to vector<22xi1>
+               ^
+generated/temp65843602610633847808.mlir:952:16: note: see current operation: %4 = "arith.constant"() <{value = dense<false> : vector<22xi1>}> : () -> vector<22xi1>
+generated/temp65843602610633847808.mlir:952:16: error: Test iterating `IntegerAttr`: false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+        %167 = vector.broadcast %false_19 : i1 to vector<22xi1>
+               ^
+generated/temp65843602610633847808.mlir:952:16: note: see current operation: %4 = "arith.constant"() <{value = dense<false> : vector<22xi1>}> : () -> vector<22xi1>
+generated/temp65843602610633847808.mlir:1361:11: error: Test iterating `int64_t`: unable to iterate type
+    %21 = vector.broadcast %c19611_i16 : i16 to vector<i16>
+          ^
+generated/temp65843602610633847808.mlir:1361:11: note: see current operation: %0 = "arith.constant"() <{value = dense<19611> : vector<i16>}> : () -> vector<i16>
+generated/temp65843602610633847808.mlir:1361:11: error: Test iterating `uint64_t`: unable to iterate type
+    %21 = vector.broadcast %c19611_i16 : i16 to vector<i16>
+          ^
+generated/temp65843602610633847808.mlir:1361:11: note: see current operation: %0 = "arith.constant"() <{value = dense<19611> : vector<i16>}> : () -> vector<i16>
+generated/temp65843602610633847808.mlir:1361:11: error: Test iterating `APInt`: 19611
+    %21 = vector.broadcast %c19611_i16 : i16 to vector<i16>
+          ^
+generated/temp65843602610633847808.mlir:1361:11: note: see current operation: %0 = "arith.constant"() <{value = dense<19611> : vector<i16>}> : () -> vector<i16>
+generated/temp65843602610633847808.mlir:1361:11: error: Test iterating `IntegerAttr`: 19611 : i16
+    %21 = vector.broadcast %c19611_i16 : i16 to vector<i16>
+          ^
+generated/temp65843602610633847808.mlir:1361:11: note: see current operation: %0 = "arith.constant"() <{value = dense<19611> : vector<i16>}> : () -> vector<i16>
+generated/temp65843602610633847808.mlir:1368:11: error: Test iterating `int64_t`: unable to iterate type
+    %27 = vector.broadcast %cst_2 : f32 to vector<12xf32>
+          ^
+generated/temp65843602610633847808.mlir:1368:11: note: see current operation: %2 = "arith.constant"() <{value = dense<0x4DBCC2DB> : vector<12xf32>}> : () -> vector<12xf32>
+generated/temp65843602610633847808.mlir:1368:11: error: Test iterating `uint64_t`: unable to iterate type
+    %27 = vector.broadcast %cst_2 : f32 to vector<12xf32>
+          ^
+generated/temp65843602610633847808.mlir:1368:11: note: see current operation: %2 = "arith.constant"() <{value = dense<0x4DBCC2DB> : vector<12xf32>}> : () -> vector<12xf32>
+generated/temp65843602610633847808.mlir:1368:11: error: Test iterating `APInt`: unable to iterate type
+    %27 = vector.broadcast %cst_2 : f32 to vector<12xf32>
+          ^
+generated/temp65843602610633847808.mlir:1368:11: note: see current operation: %2 = "arith.constant"() <{value = dense<0x4DBCC2DB> : vector<12xf32>}> : () -> vector<12xf32>
+mlir-opt: /home/jacob/projects/MLIRSmith/llvm/include/llvm/Support/Casting.h:572: decltype(auto) llvm::cast(From&) [with To = mlir::IntegerAttr; From = mlir::Attribute]: Assertion `isa<To>(Val) && "cast<Ty>() argument of incompatible type!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: ../build/bin/mlir-opt --test-compose-subview --convert-amdgpu-to-rocdl --test-elements-attr-interface --linalg-bufferize --test-scf-if-utils --convert-amdgpu-to-rocdl --test-decompose-call-graph-types --test-func-set-type --topological-sort --buffer-deallocation generated/temp65843602610633847808.mlir
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlir-opt        0x000055652b257bdb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 59
+1  mlir-opt        0x000055652b2549cc
+2  libpthread.so.0 0x00007f3e2f516980
+3  libc.so.6       0x00007f3e2e143e87 gsignal + 199
+4  libc.so.6       0x00007f3e2e1457f1 abort + 321
+5  libc.so.6       0x00007f3e2e1353fa
+6  libc.so.6       0x00007f3e2e135472
+7  mlir-opt        0x000055652d828782
+8  mlir-opt        0x000055652d82da74
+9  mlir-opt        0x000055652d82f4fc
+10 mlir-opt        0x000055652d8286a9
+11 mlir-opt        0x000055652d82e505
+12 mlir-opt        0x000055652d9cf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+13 mlir-opt        0x000055652d9d0223
+14 mlir-opt        0x000055652d9d08c1 mlir::PassManager::run(mlir::Operation*) + 1153
+15 mlir-opt        0x000055652d9c0efc
+16 mlir-opt        0x000055652d9c28b5
+17 mlir-opt        0x000055652d9c2a71
+18 mlir-opt        0x000055652dac8260 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) + 96
+19 mlir-opt        0x000055652d9bbbc9 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) + 185
+20 mlir-opt        0x000055652d9c2d9a mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) + 746
+21 mlir-opt        0x000055652b1aa0c5 main + 165
+22 libc.so.6       0x00007f3e2e126c87 __libc_start_main + 231
+23 mlir-opt        0x000055652b22b95a _start + 42
+Aborted

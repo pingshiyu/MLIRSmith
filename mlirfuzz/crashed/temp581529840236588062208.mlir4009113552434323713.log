@@ -1,0 +1,26 @@
+Testing : mlir-opt: /home/jacob/projects/MLIRSmith/llvm/include/llvm/Support/Casting.h:578: decltype(auto) llvm::cast(From*) [with To = mlir::SymbolOpInterface; From = mlir::Operation]: Assertion `isa<To>(Val) && "cast<Ty>() argument of incompatible type!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.	Program arguments: ../build/bin/mlir-opt --test-print-dominance generated/temp581529840236588062208.mlir
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  mlir-opt        0x0000564fe4857bdb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 59
+1  mlir-opt        0x0000564fe48549cc
+2  libpthread.so.0 0x00007f691f3c6980
+3  libc.so.6       0x00007f691dff3e87 gsignal + 199
+4  libc.so.6       0x00007f691dff57f1 abort + 321
+5  libc.so.6       0x00007f691dfe53fa
+6  libc.so.6       0x00007f691dfe5472
+7  mlir-opt        0x0000564fe6e3de17
+8  mlir-opt        0x0000564fe6fcf301 mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) + 1297
+9  mlir-opt        0x0000564fe6fd0223
+10 mlir-opt        0x0000564fe6fd08c1 mlir::PassManager::run(mlir::Operation*) + 1153
+11 mlir-opt        0x0000564fe6fc0efc
+12 mlir-opt        0x0000564fe6fc28b5
+13 mlir-opt        0x0000564fe6fc2a71
+14 mlir-opt        0x0000564fe70c8260 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) + 96
+15 mlir-opt        0x0000564fe6fbbbc9 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) + 185
+16 mlir-opt        0x0000564fe6fc2d9a mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) + 746
+17 mlir-opt        0x0000564fe47aa0c5 main + 165
+18 libc.so.6       0x00007f691dfd6c87 __libc_start_main + 231
+19 mlir-opt        0x0000564fe482b95a _start + 42
+Aborted
